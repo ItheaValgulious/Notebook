@@ -1,0 +1,1 @@
+var nc=new notebook.NotebookCanvas();

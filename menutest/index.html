@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>级联菜单示例</title>
+    <link rel="stylesheet" href="menu.css">
+</head>
+<body>
+    <div id="app"></div>
+    <script src="menu.js"></script>
+    <script>
+        // 测试配置
+        const menuConfig = [
+            {
+                text: "文件",
+                children: [
+                    {
+                        text: "新建",
+                        children: [
+                            {
+                                text: "文档",
+                                action: () => alert("新建文档")
+                            },
+                            {
+                                text: "表格",
+                                action: () => alert("新建表格")
+                            }
+                        ]
+                    },
+                    {
+                        text: "打开",
+                        action: () => alert("打开")
+                    },
+                    {
+                        text: "保存",
+                        action: () => alert("保存")
+                    }
+                ]
+            },
+            {
+                text: "编辑",
+                children: [
+                    {
+                        text: "复制",
+                        action: () => alert("复制")
+                    },
+                    {
+                        text: "粘贴",
+                        action: () => alert("粘贴")
+                    },
+                    {
+                        text: "更多",
+                        children: [
+                            {
+                                text: "查找",
+                                action: () => alert("查找")
+                            },
+                            {
+                                text: "替换",
+                                action: () => alert("替换")
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        // 创建菜单并添加到页面
+        document.getElementById('app').appendChild(create_menu(menuConfig));
+    </script>
+</body>
+</html>

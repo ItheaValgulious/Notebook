@@ -1,0 +1,44 @@
+写一个简单的js-html-css界面实现菜单栏无限级级联,结构如下: 
+<div class="headbox">
+<div class="menu">
+<div class="menu_column">
+<div class="menu_column">
+<div class="menu_item"></div>
+</div>
+
+<div class="menu_item"></div>
+...
+</div>
+...
+</div>
+</div>
+
+即每个菜单文字部分用menu_item包裹,用menu_column包裹子菜单的menu_item
+
+请生成对应的js和css以支持菜单的级联展开功能,并使界面美观
+请使用原生js和css实现
+
+你的实现应只包括css文件和js文件,通过在js调用create_menu(config)返回创建好的html元素
+config为一个对象,格式为
+[
+    {
+        "text": "菜单1",
+        "children": [
+            {
+                "text": "子菜单1-1",
+                "children": [
+                    {"text": "子菜单1-1-1","action": some_function},
+                    {"text": "子菜单1-1-2", "action": some_function}
+                ]
+            },
+            {"text": "子菜单1-2","action": some_function}
+        ]
+    },
+    {
+        "text": "菜单2",
+        "children": [
+            {"text": "子菜单2-1"},
+            {"text": "子菜单2-2"}
+        ]
+    }
+]

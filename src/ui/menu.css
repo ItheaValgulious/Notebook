@@ -1,0 +1,74 @@
+.headbox {
+    position: relative;
+    width: 100%;
+    height: 40px;
+    background-color: #f0f0f0;
+}
+
+.menu {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.menu_column {
+    position: relative;
+    display: none;
+    min-width: 150px;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    border-radius: 4px;
+    padding: 5px 0;
+}
+
+.menu_item {
+    position: relative;
+    padding: 8px 15px;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #333;
+}
+
+/* 顶层菜单项特殊样式 */
+.menu > .menu_item {
+    height: 100%;
+    padding: 0 15px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.menu_item:hover {
+    background-color: #f0f0f0;
+}
+
+/* 显示子菜单的样式 */
+.menu > .menu_item .menu_column {
+    position: absolute;
+    top: 100%;
+    left: 0;
+}
+
+.menu_column .menu_item .menu_column {
+    position: absolute;
+    top: 0;
+    left: 100%;
+}
+
+/* 有子菜单的项添加箭头 */
+.menu_item.has-children::after {
+    content: '▸';
+    margin-left: 10px;
+}
+
+.menu > .menu_item.has-children::after {
+    content: '▾';
+}
+
+/* 鼠标悬停时显示子菜单 */
+.menu_item:hover > .menu_column {
+    display: block;
+}
