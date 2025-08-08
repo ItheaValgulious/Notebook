@@ -2,12 +2,16 @@
     function Stroke(styleid=0) {
         this.points = [];
         this.styleid = styleid;
-        this.rect = [0,0,notebook.Config.canvas_width,notebook.Config.canvas_height];// x1,y1,x2,y2
+        this.rect = notebook.utils.Rect.empty();
     }
     Stroke.prototype.push = function (point) {
         this.points.push(point);
+        this.rect.add(point.x, point.y);
     }
-    Stroke.prototype.draw = function (ctx) {
+    Stroke.prototype.draw = function (ctx,dirty_rect) {
+        if(this.rect.x2 < dirty_rect.x1 || this.rect.x1 > dirty_rect.x2 ||
+            this.rect.y2 < dirty_rect.y1 || this.rect.y1 > dirty_rect.y2) return;
+        
         var tension = notebook.Config.tension;
         var calc_width=notebook.stroke_styles[this.styleid].calc_width;
 
@@ -23,6 +27,8 @@
             const p1 = this.points[i];
             const p2 = this.points[i + 1];
             const p3 = i < this.points.length - 2 ? this.points[i + 2] : p2;
+
+            if(!dirty_rect.in(p1.x, p1.y) && !dirty_rect.in(p2.x, p2.y)) continue;
 
             // 计算三次贝塞尔控制点
             const cp1x = p1.x + (p2.x - p0.x) * tension / 3;
@@ -65,18 +71,16 @@
         this.points = stroke;
     }
     Stroke.prototype.calc_rect=function(){
-        var rect=[notebook.Config.canvas_width,notebook.Config.canvas_height,0,0];
+        var rect=notebook.utils.Rect.empty();
         for(var point of this.points){
-            rect[0]=Math.min(rect[0],point.x);
-            rect[1]=Math.min(rect[0],point.y);
-            rect[2]=Math.max(rect[0],point.x);
-            rect[3]=Math.max(rect[0],point.y);
+            rect.add(point.x,point.y);
         }
         this.rect=rect;
     }
     Stroke.prototype.collide_circle = function(x, y, r) {
         // Quick bounding box check
-        if (x + r < this.rect[0] || x - r > this.rect[2] || y + r < this.rect[1] || y - r > this.rect[3]) return false;
+        if(x+r < this.rect.x1 || x-r > this.rect.x2 || y+r < this.rect.y1 || y-r > this.rect.y2)
+            return false;
         // Check each segment
         for (let i = 0; i < this.points.length - 1; i++) {
             const p1 = this.points[i];
