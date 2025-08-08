@@ -2,6 +2,7 @@
     function Stroke(styleid=0) {
         this.points = [];
         this.styleid = styleid;
+        this.rect = [0,0,notebook.Config.canvas_width,notebook.Config.canvas_height];// x1,y1,x2,y2
     }
     Stroke.prototype.push = function (point) {
         this.points.push(point);
@@ -62,6 +63,40 @@
         // if(confirm())document.writeln(text);
         for (var i = this.points.length - d; i < this.points.length; i++)stroke.push(this.points[i].copy());
         this.points = stroke;
+    }
+    Stroke.prototype.calc_rect=function(){
+        var rect=[notebook.Config.canvas_width,notebook.Config.canvas_height,0,0];
+        for(var point of this.points){
+            rect[0]=Math.min(rect[0],point.x);
+            rect[1]=Math.min(rect[0],point.y);
+            rect[2]=Math.max(rect[0],point.x);
+            rect[3]=Math.max(rect[0],point.y);
+        }
+        this.rect=rect;
+    }
+    Stroke.prototype.collide_circle = function(x, y, r) {
+        // Quick bounding box check
+        if (x + r < this.rect[0] || x - r > this.rect[2] || y + r < this.rect[1] || y - r > this.rect[3]) return false;
+        // Check each segment
+        for (let i = 0; i < this.points.length - 1; i++) {
+            const p1 = this.points[i];
+            const p2 = this.points[i + 1];
+            // Closest point on segment to circle center
+            const dx = p2.x - p1.x;
+            const dy = p2.y - p1.y;
+            const l2 = dx * dx + dy * dy;
+            let t = 0;
+            if (l2 !== 0) {
+                t = ((x - p1.x) * dx + (y - p1.y) * dy) / l2;
+                t = Math.max(0, Math.min(1, t));
+            }
+            const closestX = p1.x + t * dx;
+            const closestY = p1.y + t * dy;
+            if (notebook.utils.distance(x, y, closestX, closestY) < r) {
+                return true;
+            }
+        }
+        return false;
     }
     notebook.Stroke = Stroke;
 })();

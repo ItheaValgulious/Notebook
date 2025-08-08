@@ -2,8 +2,8 @@
     function Pen(name){
         this.name=name;
         this.on_move=function(){};
-        this.on_begin=null;
-        this.on_end=null;
+        this.on_begin=function(){};
+        this.on_end=function(){};
     }
     var pencil=new Pen('pencil'),
         eraser=new Pen('eraser'),
@@ -19,6 +19,16 @@
     pencil.on_end=function(canvas,event){
         this.current_stroke.simplify();
     }.bind(pencil);
+
+    eraser.on_move=function(canvas,event,x,y){
+        for(var i=0;i<canvas.strokes.length;i++){
+            var stroke=canvas.strokes[i];
+            if(stroke.collide_circle(x,y,notebook.Env.eraser_radius)){
+                canvas.strokes.splice(i,1);
+                i--;
+            }
+        }
+    }.bind(eraser);
 
     window.notebook.pens=[
         pencil,
