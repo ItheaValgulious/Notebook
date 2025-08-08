@@ -4,9 +4,12 @@
         min_point_distance:3,
         tension:0.5,
         reserved_end_point_number:3,
-        debug:true,
+        debug:false,
         canvas_width:800,
         canvas_height:600,
         canvas_dp:2,
+    };
+    window.notebook.Env={
+        current_pen:0
     };
 })();

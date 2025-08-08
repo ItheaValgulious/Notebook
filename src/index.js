@@ -1,1 +1,4 @@
-var nc=new notebook.NotebookCanvas();
+window.onload = ()=>{
+    notebook.init_menu();
+    var nc=new notebook.NotebookCanvas();
+}

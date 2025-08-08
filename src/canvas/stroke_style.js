@@ -6,7 +6,7 @@
         });
     }
     stroke_styles = [
-        new StrokeStyle('black',null)
+        new StrokeStyle('black', null)
     ];
     window.notebook.StrokeStyle = StrokeStyle;
     window.notebook.stroke_styles = stroke_styles;

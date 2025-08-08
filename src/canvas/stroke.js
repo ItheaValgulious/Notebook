@@ -35,20 +35,33 @@
             ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
             ctx.stroke();
         }
-    }
-    Stroke.prototype.simplify = function () {
-        if (this.points.length <= notebook.Config.reserved_end_point_number * 2) return;
 
-        var stroke = [], d = notebook.Config.reserved_end_point_number;
-        for (var i = 0; i < d; i++)stroke.push(this.points[i].copy());
-        for (var i = d; i < this.points.length - d - 1; i++) {
-            var p = this.points[i], lp = stroke[stroke.length - 1];
-            if (window.notebook.utils.distance(p.x, p.y, lp.x, lp.y) >= notebook.Config.min_point_distance) {
-                stroke.push(p.copy());
+        if(notebook.Config.debug){
+            ctx.fillStyle='red';
+            for(let p of this.points){
+                ctx.beginPath();
+                ctx.arc(p.x,p.y,1,0,Math.PI*2);
+                ctx.fill();
             }
         }
+    }
+    Stroke.prototype.simplify = function () {
+        var stroke = [], d = notebook.Config.reserved_end_point_number;
+        if (this.points.length <= d * 2) return;
+
+        for (var i = 0; i < d; i++)stroke.push(this.points[i].copy());
+        var text='';
+        for (var i = d; i < this.points.length - d - 1; i++) {
+            var p = this.points[i], lp = stroke[stroke.length - 1];
+            if (notebook.utils.distance(p.x, p.y, lp.x, lp.y) >= notebook.Config.min_point_distance) {
+                stroke.push(p.copy());
+            }else{
+                text+=('point skipped'+' distance:'+','+ notebook.utils.distance(p.x, p.y, lp.x, lp.y)+'<br>')
+            }
+        }
+        // if(confirm())document.writeln(text);
         for (var i = this.points.length - d; i < this.points.length; i++)stroke.push(this.points[i].copy());
         this.points = stroke;
     }
-    window.notebook.Stroke = Stroke;
+    notebook.Stroke = Stroke;
 })();
