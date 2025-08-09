@@ -1,4 +1,5 @@
 window.onload = ()=>{
     notebook.init_menu();
-    var nc=new notebook.NotebookCanvas();
+    var canvas=new notebook.Canvas();
+    canvas.append_to();
 }

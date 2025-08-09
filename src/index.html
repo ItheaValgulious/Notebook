@@ -19,7 +19,6 @@
     <script src="canvas/canvas.js"></script>
     <script src="canvas/pen.js"></script>
     
-    <script src="canvas/notebook.js"></script>
 
     <script src="ui/menu.js"></script>
     <script src="index.js"></script>
@@ -28,9 +27,10 @@
 <body>
     <div class="menu_container"></div>
     <div class="toolbox_container">
-        <button class="tool_button" onclick="notebook.Env.current_pen=0">Pen</button>
-        <button class="tool_button" onclick="notebook.Env.current_pen=1">Eraser</button>
-        <button class="tool_button" onclick="notebook.Env.current_pen=2">Selector</button>
+        <button class="tool_button" onclick="notebook.Env.current_pen['pen']='pencil'">Pen</button>
+        <button class="tool_button" onclick="notebook.Env.current_pen['pen']='eraser'">Eraser</button>
+        <button class="tool_button" onclick="notebook.Env.current_pen['pen']='selector'">Selector</button>
+        <button class="tool_button" onclick="notebook.Env.current_pen['pen']='touch_mover'">Mover</button>
     </div>
     <div class="content_container"></div>
 </body>

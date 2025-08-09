@@ -1,32 +1,36 @@
 (function () {
-    function Pen(name) {
+    function Pen(name, type) {
         this.name = name;
+        this.type = [];
         this.on_move = function () { };
         this.on_begin = function () { };
         this.on_end = function () { };
+        Pen.pens[name] = this;
     }
-    var pencil = new Pen('pencil'),
-        eraser = new Pen('eraser'),
-        selector = new Pen('selector');
+    Pen.pens = {};
+    var pencil = new Pen('pencil', ['pen','mouse']),
+        eraser = new Pen('eraser', ['pen']),
+        selector = new Pen('selector', ['pen']);
+    var touch_mover = new Pen('touch_mover', ['touch', 'mouse']);
 
-    pencil.on_begin = function (canvas, event, x, y) {
+    pencil.on_begin = function (canvas, event, point) {
         this.current_stroke = new notebook.Stroke()
         canvas.add_object(this.current_stroke);
     }.bind(pencil);
-    pencil.on_move = function (canvas, event, x, y) {
-        this.current_stroke.push(new notebook.StrokePoint(x, y, event.pressure));
+    pencil.on_move = function (canvas, event, point) {
+        this.current_stroke.push(new notebook.StrokePoint(point.x, point.y, event.pressure));
     }.bind(pencil);
-    pencil.on_end = function (canvas, event, x, y) {
+    pencil.on_end = function (canvas, event, point) {
         this.current_stroke.simplify();
         this.current_stroke.calc_rect();
         canvas.add_dirty_rect(this.current_stroke.rect);
         this.current_stroke = null;
     }.bind(pencil);
 
-    eraser.on_move = function (canvas, event, x, y) {
+    eraser.on_move = function (canvas, event, point) {
         for (var i = 0; i < canvas.objects.length; i++) {
             var stroke = canvas.objects[i];
-            if (stroke.collide_circle(x, y, notebook.Env.eraser_radius)) {
+            if (stroke.collide_circle(point.x, point.y, notebook.Env.eraser_radius)) {
                 canvas.objects.splice(i, 1);
                 canvas.add_dirty_rect(stroke.rect);
                 i--;
@@ -34,11 +38,26 @@
         }
     }.bind(eraser);
 
-    selector.on_begin = function (canvas, event, x, y) {
+    touch_mover.on_begin = function (canvas, event, point) {
+        this.lastpos = point.add(canvas.pos.mul(-1));
+    }.bind(touch_mover);
+    touch_mover.on_move = function (canvas, event, point) {
+        point = point.add(canvas.pos.mul(-1));
+        var dx = point.x - this.lastpos.x, dy = point.y - this.lastpos.y;
+        canvas.pos.x -= dx;
+        canvas.pos.y -= dy;
+        canvas.add_dirty_rect(notebook.utils.Rect.full().move(canvas.pos.x, canvas.pos.y));
+        this.lastpos = point;
+    }
+    touch_mover.on_end = function (canvas, event, point) {
+        this.lastpos = null;
+    }
+
+    selector.on_begin = function (canvas, event, point) {
         if (canvas.selected.length) {
             this.mode = 'move';
-            this.lastpos = { x: x, y: y };
-            this.sum = { x: 0, y: 0 };
+            this.lastpos = point;
+            this.sum = notebook.utils.Point.zero();
         } else {
             this.mode = 'select';
             this.stroke = new notebook.Stroke();
@@ -46,9 +65,9 @@
             this.stroke.styleid = 'select_chain';
         }
     }
-    selector.on_move = function (canvas, event, x, y) {
+    selector.on_move = function (canvas, event, point) {
         if (this.mode == 'move') {
-            var dx = x - this.lastpos.x, dy = y - this.lastpos.y;
+            var dx = point.x - this.lastpos.x, dy = point.y - this.lastpos.y;
             for (var i = 0; i < canvas.selected.length; i++) {
                 var obj = canvas.selected[i];
                 canvas.add_dirty_rect(obj.rect);
@@ -57,12 +76,12 @@
             }
             this.sum.x += Math.abs(dx);
             this.sum.y += Math.abs(dy);
-            this.lastpos = { x: x, y: y };
+            this.lastpos = point;
         } else if (this.mode == 'select') {
-            this.stroke.push(new notebook.StrokePoint(x, y, event.pressure));
+            this.stroke.push(new notebook.StrokePoint(point.x, point.y, event.pressure));
         }
     }.bind(selector);
-    selector.on_end = function (canvas, event, x, y) {
+    selector.on_end = function (canvas, event, point) {
         if (this.mode == 'select') {
             canvas.objects.splice(canvas.objects.indexOf(this.stroke), 1);
             canvas.add_dirty_rect(this.stroke.rect);
@@ -97,9 +116,5 @@
 
     }
 
-    window.notebook.pens = [
-        pencil,
-        eraser,
-        selector
-    ];
+    window.notebook.pens = Pen.pens;
 })();

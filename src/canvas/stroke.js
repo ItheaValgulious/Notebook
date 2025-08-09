@@ -5,7 +5,7 @@
         this.rect = notebook.utils.Rect.empty();
         this.selected = false;
         this.canvas = null;
-        this.pos = { x: 0, y: 0 };
+        this.pos = notebook.utils.Point.zero();
     }
     Stroke.prototype.push = function (point) {
         this.points.push(point);
@@ -101,7 +101,7 @@
         // Quick bounding box check
         if (x + r < this.rect.x1 || x - r > this.rect.x2 || y + r < this.rect.y1 || y - r > this.rect.y2)
             return false;
-        
+
         // Adjust coordinates to stroke's position
         x -= this.pos.x;
         y -= this.pos.y;
@@ -141,6 +141,14 @@
         this.pos.x += dx;
         this.pos.y += dy;
         this.rect.move(dx, dy)
+    }
+    Stroke.prototype.save = function () {
+        var data = {
+            points: this.points.map(p => ({ x: p.x, y: p.y, pressure: p.pressure })),
+            styleid: this.styleid,
+            pos: { x: this.pos.x, y: this.pos.y }
+        };
+        return data;
     }
     notebook.Stroke = Stroke;
 })();

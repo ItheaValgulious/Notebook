@@ -9,12 +9,18 @@
         canvas_dp:2,
         dirty_bias:10,
         debug:true,
-        show_dirty_rect:false,
+        show_dirty_rect:true,
         selected_width:2,
         unselect_min_distance:10,
+        selector_width:5
     };
     window.notebook.Env={
-        current_pen:0,
+        current_pen:{
+            'pen':'pencil',
+            'touch':'touch_mover',
+            'mouse':'touch_mover'
+        },
         eraser_radius:10,
+        current_pointer_type:null
     };
 })();
