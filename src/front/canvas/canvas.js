@@ -16,7 +16,7 @@
         object.canvas = this;
     }
     Canvas.prototype.get_true_position = function (event) {
-        return new notebook.utils.Point((event.pageX - this.canvas_rect.left) * this.dp + this.pos.x, (event.pageY - this.canvas_rect.top) * this.dp + this.pos.y);
+        return new notebook.utils.Point((event.offsetX * this.dp + this.pos.x), (event.offsetY * this.dp + this.pos.y));
     }
     Canvas.prototype.init = function (dom_canvas) {
         this.canvas = dom_canvas;
@@ -99,27 +99,30 @@
         this.dirty_rect.add(rect.x2 + notebook.Config.dirty_bias, rect.y2 + notebook.Config.dirty_bias);
     }
     Canvas.prototype.save = function () {
-        var data={};
-        data.objects=this.objects.map(function(o){return o.save();});
-        data.styles=notebook.stroke_styles.save();
-        data.pos={x:this.pos.x,y:this.pos.y};
-        return data;
+        var data = {};
+        data.objects = this.objects.map(function (o) { return o.save(); });
+        data.styles = notebook.stroke_styles.save();
+        data.pos = { x: this.pos.x, y: this.pos.y };
+        return JSON.stringify(data);
     }
-    Canvas.prototype.append_to=function(parent){
-        this.init(document.createElement('canvas'));
-        (parent||document.body).appendChild(this.canvas);
-    }
-    Canvas.prototype.load = function (data) {
-        this.objects=[];
-        for(var o of data.objects){
-            var s=new notebook.Stroke();
+    Canvas.prototype.load = function (text) {
+        var data = JSON.parse(text);
+
+        this.pos.x = data.pos.x;
+        this.pos.y = data.pos.y;
+        this.objects = [];
+        for (var o of data.objects) {
+            var s = new notebook.Stroke();
             s.load(o);
             this.add_object(s);
         }
         notebook.stroke_styles.load(data.styles);
-        this.pos.x=data.pos.x;
-        this.pos.y=data.pos.y;
-        this.add_dirty_rect(notebook.utils.Rect.full().move(this.pos.x,this.pos.y));
+
+        this.add_dirty_rect(notebook.utils.Rect.full().move(this.pos.x, this.pos.y));
+    }
+    Canvas.prototype.append_to = function (parent) {
+        this.init(document.createElement('canvas'));
+        (parent||document.body).appendChild(this.canvas);
     }
 
 

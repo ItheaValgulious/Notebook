@@ -14,7 +14,7 @@
     var touch_mover = new Pen('touch_mover', ['touch', 'mouse']);
 
     pencil.on_begin = function (canvas, event, point) {
-        this.current_stroke = new notebook.Stroke()
+        this.current_stroke = new notebook.Stroke(notebook.Env.current_style);
         canvas.add_object(this.current_stroke);
     }.bind(pencil);
     pencil.on_move = function (canvas, event, point) {
@@ -60,9 +60,8 @@
             this.sum = notebook.utils.Point.zero();
         } else {
             this.mode = 'select';
-            this.stroke = new notebook.Stroke();
+            this.stroke = new notebook.Stroke('select_chain');
             canvas.add_object(this.stroke);
-            this.stroke.styleid = 'select_chain';
         }
     }
     selector.on_move = function (canvas, event, point) {

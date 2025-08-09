@@ -1,11 +1,42 @@
-const { app, BrowserWindow } = require('electron/main')
+const { app, BrowserWindow,ipcMain } = require('electron/main')
+const { FileSystem, Dialoger } = require('./src/back/system')
+
+var file_system = new FileSystem();
+var dialoger = new Dialoger();
+ipcMain.handle('read_file', async (event, filePath) => {
+    return await file_system.open(filePath);
+});
+
+ipcMain.handle('save_file', async (event, filePath, content) => {
+    return await file_system.save(filePath, content);
+});
+
+ipcMain.handle('read_folder', async (event, folderPath) => {
+    return await file_system.load_folder(folderPath);
+});
+
+ipcMain.handle('show-open-dialog', async () => {
+    return await dialoger.openFileDialog();
+});
+
+ipcMain.handle('show-save-dialog', async () => {
+    return await dialoger.saveFileDialog();
+});
+
+ipcMain.handle('show-folder-dialog', async () => {
+    return await dialoger.selectFolderDialog();
+});
 
 const createWindow = () => {
     const win = new BrowserWindow({
-        fullscreen: true
-    })
+        fullscreen: true,
+        webPreferences: {
+            preload: __dirname + '/src/back/preload.js',
+            contextIsolation: true
+        }
+    });
 
-    win.loadFile('./src/index.html')
+    win.loadFile('./src/front/index.html')
 }
 
 app.whenReady().then(() => {

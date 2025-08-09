@@ -31,11 +31,11 @@
             this.rect.y2 < dirty_rect.y1 || this.rect.y1 > dirty_rect.y2) return;
 
         var tension = notebook.Config.tension;
-        var calc_width = notebook.stroke_styles[styleid].calc_width;
+        var calc_width = notebook.stroke_styles.styles[styleid].calc_width;
 
         if (this.points.length == 1) {
             ctx.beginPath();
-            notebook.stroke_styles[styleid].apply_style(ctx);
+            notebook.stroke_styles.styles[styleid].apply_style(ctx);
             ctx.arc(this.points[0].x + this.pos.x, this.points[0].y + this.pos.y, calc_width(this.points.pressure * 2), 0, Math.PI * 2);
             ctx.fill();
         }
@@ -59,7 +59,7 @@
             ctx.moveTo(p1.x + this.pos.x, p1.y + this.pos.y);
             ctx.lineWidth = calc_width((p1.pressure + p2.pressure) / 2);
             ctx.bezierCurveTo(cp1x + this.pos.x, cp1y + this.pos.y, cp2x + this.pos.x, cp2y + this.pos.y, p2.x + this.pos.x, p2.y + this.pos.y);
-            notebook.stroke_styles[styleid].apply_style(ctx);
+            notebook.stroke_styles.styles[styleid].apply_style(ctx);
             ctx.stroke();
         }
 
@@ -149,6 +149,12 @@
             pos: { x: this.pos.x, y: this.pos.y }
         };
         return data;
+    }
+    Stroke.prototype.load = function (data) {
+        this.styleid = data.styleid;
+        for (var p of data.points) this.points.push(new notebook.StrokePoint(p.x, p.y, p.pressure));
+        this.pos = new notebook.utils.Point(data.pos.x, data.pos.y);
+        this.calc_rect();
     }
     notebook.Stroke = Stroke;
 })();
