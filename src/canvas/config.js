@@ -4,11 +4,14 @@
         min_point_distance:3,
         tension:0.5,
         reserved_end_point_number:3,
-        debug:false,
         canvas_width:800,
         canvas_height:600,
         canvas_dp:2,
         dirty_bias:10,
+        debug:true,
+        show_dirty_rect:false,
+        selected_width:2,
+        unselect_min_distance:10,
     };
     window.notebook.Env={
         current_pen:0,

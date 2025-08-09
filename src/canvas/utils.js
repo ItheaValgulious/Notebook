@@ -27,6 +27,12 @@
     Rect.full=function(){
         return new Rect(0, 0, notebook.Config.canvas_width*notebook.Config.canvas_dp, notebook.Config.canvas_height*notebook.Config.canvas_dp);
     }
+    Rect.prototype.move = function (dx, dy) {
+        this.x1 += dx;
+        this.y1 += dy;
+        this.x2 += dx;
+        this.y2 += dy;
+    }
     
     window.notebook.utils = {
         distance: distance,

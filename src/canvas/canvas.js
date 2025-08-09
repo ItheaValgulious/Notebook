@@ -1,6 +1,6 @@
 (function () {
     function Canvas() {
-        this.strokes = [];
+        this.objects = [];
         this.width = notebook.Config.canvas_width;
         this.height = notebook.Config.canvas_height;
         this.dp = notebook.Config.canvas_dp;
@@ -8,8 +8,12 @@
         this.canvas = null;
         this.ctx = null;
         this.dirty_rect = notebook.utils.Rect.full();
+        this.selected = [];
     }
-
+    Canvas.prototype.add_object = function (object) {
+        this.objects.push(object);
+        object.canvas = this;
+    }
     Canvas.prototype.init = function (dom_canvas) {
         this.canvas = dom_canvas;
         this.ctx = this.canvas.getContext('2d');
@@ -21,10 +25,11 @@
 
 
         function pointer_begin(event) {
+            var [x, y] = [(event.pageX - this.canvas_rect.left) * this.dp, (event.pageY - this.canvas_rect.top) * this.dp];
             if (event.pointerType == 'pen' || notebook.Config.debug) {
                 this.canvas.addEventListener('pointermove', pointer_move);
                 this.canvas.addEventListener('pointerup', pointer_end);
-                notebook.pens[notebook.Env.current_pen].on_begin(this, event);
+                notebook.pens[notebook.Env.current_pen].on_begin(this, event, x, y);
             } else {
                 // 处理触控事件
             }
@@ -44,7 +49,8 @@
             if (event.pointerType != 'pen' && !notebook.Config.debug) return;
             this.canvas.removeEventListener('pointerup', pointer_end);
             this.canvas.removeEventListener('pointermove', pointer_move);
-            notebook.pens[notebook.Env.current_pen].on_end(this, event);
+            var [x, y] = [(event.pageX - this.canvas_rect.left) * this.dp, (event.pageY - this.canvas_rect.top) * this.dp];
+            notebook.pens[notebook.Env.current_pen].on_end(this, event, x, y);
         }
 
         pointer_begin = pointer_begin.bind(this);
@@ -69,7 +75,7 @@
         this.ctx.clearRect(this.dirty_rect.x1, this.dirty_rect.y1,
             this.dirty_rect.x2 - this.dirty_rect.x1,
             this.dirty_rect.y2 - this.dirty_rect.y1);
-        for (var stroke of this.strokes) {
+        for (var stroke of this.objects) {
             stroke.draw(this.ctx, this.dirty_rect);
         }
         this.dirty_rect = notebook.utils.Rect.empty();
