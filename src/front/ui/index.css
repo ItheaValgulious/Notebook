@@ -1,4 +1,40 @@
+body {
+    overflow: hidden;
+    margin: 0;
+}
+
+*{
+    box-sizing: border-box;
+}
+
+.head_container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    padding: 10px;
+    border-radius: 20px;
+    border:  solid 1px black;
+}
+
 canvas {
     border: 1px solid #000;
     touch-action: none;
+}
+
+.markdown_area{
+    position: absolute;
+}
+.markdown_area.selected{
+    outline: rgba(98, 145, 255, 0.79) 5px solid;
+}
+
+.vditor-ir pre.vditor-reset:focus{
+    background: none !important;
+}
+.vditor-ir pre.vditor-reset{
+    background: none !important;
+}
+.vditor-toolbar--hide{
+    display: none;
 }

@@ -13,5 +13,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {}
+  "dependencies": {
+    "vditor": "^3.11.1"
+  }
 }

@@ -9,7 +9,7 @@
         canvas_dp:2,
         dirty_bias:10,
         debug:true,
-        show_dirty_rect:true,
+        show_dirty_rect:false,
         selected_width:2,
         unselect_min_distance:10,
         selector_width:5

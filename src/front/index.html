@@ -9,7 +9,10 @@
     
     <link rel="stylesheet" href="ui/menu.css">
     <link rel="stylesheet" href="ui/index.css">
+    <link rel="stylesheet" href="../lib/vditor.css">
     
+    <script src="../lib/vditor.js"></script>
+
     <script src="canvas/config.js"></script>
     <script src="canvas/utils.js"></script>
     
@@ -18,6 +21,8 @@
     <script src="canvas/stroke.js"></script>
     <script src="canvas/canvas.js"></script>
     <script src="canvas/pen.js"></script>
+
+    <script src="canvas/markdown.js"></script>
     
 
     <script src="ui/menu.js"></script>
@@ -25,12 +30,14 @@
 
 </head>
 <body>
-    <div class="menu_container"></div>
-    <div class="toolbox_container">
-        <button class="tool_button" onclick="notebook.Env.current_pen['pen']='pencil'">Pen</button>
-        <button class="tool_button" onclick="notebook.Env.current_pen['pen']='eraser'">Eraser</button>
-        <button class="tool_button" onclick="notebook.Env.current_pen['pen']='selector'">Selector</button>
-        <button class="tool_button" onclick="notebook.Env.current_pen['pen']='touch_mover'">Mover</button>
+    <div class="head_container">
+        <div class="menu_container"></div>
+        <div class="toolbox_container">
+            <button class="tool_button" onclick="notebook.Env.current_pen['pen']='pencil'">Pen</button>
+            <button class="tool_button" onclick="notebook.Env.current_pen['pen']='eraser'">Eraser</button>
+            <button class="tool_button" onclick="notebook.Env.current_pen['pen']='selector'">Selector</button>
+            <button class="tool_button" onclick="notebook.Env.current_pen['pen']='touch_mover'">Mover</button>
+        </div>
     </div>
     <div class="content_container"></div>
 </body>

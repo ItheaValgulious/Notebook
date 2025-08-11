@@ -8,10 +8,11 @@
         Pen.pens[name] = this;
     }
     Pen.pens = {};
-    var pencil = new Pen('pencil', ['pen','mouse']),
-        eraser = new Pen('eraser', ['pen']),
-        selector = new Pen('selector', ['pen']);
+    var pencil = new Pen('pencil', ['pen', 'mouse']),
+        eraser = new Pen('eraser', ['pen', 'mouse']),
+        selector = new Pen('selector', ['pen', 'mouse']);
     var touch_mover = new Pen('touch_mover', ['touch', 'mouse']);
+    var markdown_creator = new Pen('markdown_creator', ['pen', 'mouse']);
 
     pencil.on_begin = function (canvas, event, point) {
         this.current_stroke = new notebook.Stroke(notebook.Env.current_style);
@@ -111,8 +112,6 @@
                 }
             }
         }
-
-
     }
 
     window.notebook.pens = Pen.pens;

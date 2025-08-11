@@ -110,27 +110,13 @@
         for (let i = 0; i < this.points.length - 1; i++) {
             const p1 = this.points[i];
             const p2 = this.points[i + 1];
-            // Closest point on segment to circle center
-            const dx = p2.x - p1.x;
-            const dy = p2.y - p1.y;
-            const l2 = dx * dx + dy * dy;
-            let t = 0;
-            if (l2 !== 0) {
-                t = ((x - p1.x) * dx + (y - p1.y) * dy) / l2;
-                t = Math.max(0, Math.min(1, t));
-            }
-            const closestX = p1.x + t * dx;
-            const closestY = p1.y + t * dy;
-            if (notebook.utils.distance(x, y, closestX, closestY) < r) {
-                return true;
-            }
+            if (notebok.utils.distance_to_line(x, y, p1.x, p1.y, p2.x, p2.y) < r) return true;
         }
         if (this.points.length == 1 && notebook.utils.distance(x, y, this.points[0].x, this.points[0].y) < r) return true;
         return false;
     }
     Stroke.prototype.fast_collide_rect = function (rect) {
-        return !(this.rect.x2 < rect.x1 || this.rect.x1 > rect.x2 ||
-            this.rect.y2 < rect.y1 || this.rect.y1 > rect.y2);
+        return this.rect.collide_rect(rect);
     }
     Stroke.prototype.collide_path = function (ctx) {
         for (var p of this.points)
