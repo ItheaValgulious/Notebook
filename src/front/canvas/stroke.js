@@ -41,7 +41,7 @@
             if (this.points.length == 1) {
                 ctx.beginPath();
                 notebook.stroke_styles.styles[styleid].apply_style(ctx);
-                ctx.arc(this.points[0].pos.x + this.pos.x, this.points[0].pos.y + this.pos.y, calc_width(this.points[0].pressure * 2), 0, Math.PI * 2);
+                ctx.arc(this.points[0].pos.x + this.pos.x, this.points[0].pos.y + this.pos.y, calc_width(this.points[0].pressure), 0, Math.PI * 2);
                 ctx.fill();
             }
 
@@ -153,6 +153,10 @@
             stroke.calc_rect();
             return stroke;
         }
+        on_remove_from_canvas() {
+            this.canvas.add_dirty_rect(this.rect);
+        }
+
     }
     notebook.Stroke = Stroke;
 })();

@@ -116,6 +116,10 @@
         end_edit() {
             this.canvas.content_container.style.zIndex = -1;
         }
+
+        on_remove_from_canvas() {
+            this.canvas.content_container.removeChild(this.dom);
+        }
     }
     notebook.MarkdownArea = MarkdownArea;
 })();

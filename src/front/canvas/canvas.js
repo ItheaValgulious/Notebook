@@ -36,7 +36,7 @@
         this.content_container.classList.add('content_container');
         parentNode.appendChild(this.content_container);
 
-
+        this.set_style();
 
         function pointer_begin(event) {
             var pointerType = event.pointerType;
@@ -128,13 +128,30 @@
                 var markdown = notebook.MarkdownArea.load(o);
                 this.add_object(markdown);
             }
-
-
         }
         notebook.stroke_styles.load(data.styles);
-
+        this.set_style();
         this.add_dirty_rect(notebook.utils.Rect.full().move(this.pos.x, this.pos.y));
     }
+    Canvas.prototype.move = function (dx, dy) {
+        this.pos.x += dx;
+        this.pos.y += dy;
+        this.add_dirty_rect(notebook.utils.Rect.full().move(this.pos.x, this.pos.y));
+        this.set_style();
+    }
+    Canvas.prototype.set_style = function () {
+        this.content_container.style.left = -this.pos.x / this.dp + 'px';
+        this.content_container.style.top = -this.pos.y / this.dp + 'px';
+    }
+    Canvas.prototype.remove_object = function (object) {
+        var index = this.objects.indexOf(object);
+        if (index != -1) {
+            this.objects.splice(index, 1);
+            object.on_remove_from_canvas();
+            object.canvas = null;
+        }
+    }
+
 
     window.notebook.Canvas = Canvas;
 })();

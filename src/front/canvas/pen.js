@@ -32,8 +32,7 @@
         for (var i = 0; i < canvas.objects.length; i++) {
             var stroke = canvas.objects[i];
             if (stroke.collide_circle(point.x, point.y, notebook.Env.eraser_radius)) {
-                canvas.objects.splice(i, 1);
-                canvas.add_dirty_rect(stroke.rect);
+                canvas.remove_object(stroke);
                 i--;
             }
         }
@@ -45,9 +44,7 @@
     touch_mover.on_move = function (canvas, event, point) {
         point = point.add(canvas.pos.mul(-1));
         var dx = point.x - this.lastpos.x, dy = point.y - this.lastpos.y;
-        canvas.pos.x -= dx;
-        canvas.pos.y -= dy;
-        canvas.add_dirty_rect(notebook.utils.Rect.full().move(canvas.pos.x, canvas.pos.y));
+        canvas.move(-dx, -dy);
         this.lastpos = point;
     }
     touch_mover.on_end = function (canvas, event, point) {
@@ -84,8 +81,7 @@
     }.bind(selector);
     selector.on_end = function (canvas, event, point) {
         if (this.mode == 'select') {
-            canvas.objects.splice(canvas.objects.indexOf(this.stroke), 1);
-            canvas.add_dirty_rect(this.stroke.rect);
+            canvas.remove_object(this.stroke);
 
             if (this.sum.x <= notebook.Config.click_max_distance && this.sum.y <= notebook.Config.click_max_distance) {
                 //click to select objects

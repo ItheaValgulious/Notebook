@@ -35,9 +35,8 @@
         static load(obj) {
             virtual_func_error();
         }
-        on_add_to_canvas() {
-            
-        }
+        on_add_to_canvas() { }
+        on_remove_from_canvas() { }
     }
     notebook.CanvasObj = CanvasObj;
 
