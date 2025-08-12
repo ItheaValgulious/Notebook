@@ -31,6 +31,10 @@
     Point.prototype.mul = function (k) {
         return new Point(this.x * k, this.y * k);
     }
+    Point.prototype.copy = function () {
+        return new Point(this.x, this.y);
+    }
+
 
     function Rect(x1, y1, x2, y2) {
         this.x1 = x1;
@@ -38,8 +42,8 @@
         this.x2 = x2;
         this.y2 = y2;
     }
-    Rect.prototype.in = function (x, y) {
-        return x >= this.x1 && x <= this.x2 && y >= this.y1 && y <= this.y2;
+    Rect.prototype.in = function (p) {
+        return p.x >= this.x1 && p.x <= this.x2 && p.y >= this.y1 && p.y <= this.y2;
     }
     Rect.prototype.add = function (x, y) {
         this.x1 = Math.min(this.x1, x);
@@ -67,6 +71,13 @@
         return !(this.x2 < rect.x1 || this.x1 > rect.x2 ||
             this.y2 < rect.y1 || this.y1 > rect.y2);
     }
+    Rect.prototype.set = function (x1, y1, x2, y2) {
+        this.x1 = x1;
+        this.y1 = y1;
+        this.x2 = x2;
+        this.y2 = y2;
+    }
+
 
     function Waiter(checker, action, interval = 100) {
         this.checker = checker;

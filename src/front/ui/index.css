@@ -15,13 +15,27 @@ body {
     padding: 10px;
     border-radius: 20px;
     border:  solid 1px black;
+    z-index: 1;
 }
 
 canvas {
+    position: absolute;
     border: 1px solid #000;
     touch-action: none;
+    z-index: 0;
+    left: 0;
+    top: 0;
 }
 
+
+.content_container{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
 .markdown_area{
     position: absolute;
 }

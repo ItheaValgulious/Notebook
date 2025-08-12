@@ -11,8 +11,11 @@
         debug:true,
         show_dirty_rect:false,
         selected_width:2,
-        unselect_min_distance:10,
-        selector_width:5
+        click_max_distance:10,
+        selector_width:5,
+        default_markdown_width:500,
+        default_markdown_height:500,
+
     };
     window.notebook.Env={
         current_pen:{

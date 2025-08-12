@@ -6,6 +6,7 @@
         this.dp = notebook.Config.canvas_dp;
         this.canvas_rect = null;
         this.canvas = null;
+        this.content_container = null;
         this.ctx = null;
         this.dirty_rect = notebook.utils.Rect.full();
         this.selected = [];
@@ -14,24 +15,32 @@
     Canvas.prototype.add_object = function (object) {
         this.objects.push(object);
         object.canvas = this;
+        object.on_add_to_canvas();
     }
     Canvas.prototype.get_true_position = function (event) {
         return new notebook.utils.Point((event.offsetX * this.dp + this.pos.x), (event.offsetY * this.dp + this.pos.y));
     }
-    Canvas.prototype.init = function (dom_canvas) {
-        this.canvas = dom_canvas;
+    Canvas.prototype.init = function (parentNode) {
+        parentNode = parentNode || document.body;
+
+        this.canvas = document.createElement('canvas');
         this.ctx = this.canvas.getContext('2d');
         this.canvas.width = this.width * this.dp;
         this.canvas.height = this.height * this.dp;
         this.canvas.style.width = this.width + 'px';
         this.canvas.style.height = this.height + 'px';
         this.canvas_rect = this.canvas.getBoundingClientRect();
+        parentNode.appendChild(this.canvas);
+
+        this.content_container = document.createElement('div');
+        this.content_container.classList.add('content_container');
+        parentNode.appendChild(this.content_container);
 
 
 
         function pointer_begin(event) {
-            var pointerType=event.pointerType;
-            if (notebook.Config.debug&&pointerType=='mouse') pointerType = 'pen';
+            var pointerType = event.pointerType;
+            if (notebook.Config.debug && pointerType == 'mouse') pointerType = 'pen';
             this.canvas.addEventListener('pointermove', pointer_move);
             this.canvas.addEventListener('pointerup', pointer_end);
 
@@ -39,8 +48,8 @@
             notebook.Env.current_pointer_type = pointerType;
         }
         function pointer_move(ev) {
-            var pointerType=ev.pointerType;
-            if (notebook.Config.debug&&pointerType=='mouse') pointerType = 'pen';
+            var pointerType = ev.pointerType;
+            if (notebook.Config.debug && pointerType == 'mouse') pointerType = 'pen';
             if (notebook.Env.current_pointer_type != pointerType) return;
 
             var events;
@@ -54,7 +63,7 @@
         function pointer_end(event) {
             var pointerType = event.pointerType;
 
-            if (notebook.Config.debug&&pointerType=='mouse') pointerType = 'pen';
+            if (notebook.Config.debug && pointerType == 'mouse') pointerType = 'pen';
             if (notebook.Env.current_pointer_type != pointerType) return;
 
             this.canvas.removeEventListener('pointerup', pointer_end);
@@ -120,11 +129,6 @@
 
         this.add_dirty_rect(notebook.utils.Rect.full().move(this.pos.x, this.pos.y));
     }
-    Canvas.prototype.append_to = function (parent) {
-        this.init(document.createElement('canvas'));
-        (parent||document.body).appendChild(this.canvas);
-    }
-
 
     window.notebook.Canvas = Canvas;
 })();

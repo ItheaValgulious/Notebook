@@ -1,146 +1,155 @@
 (function () {
-    function Stroke(styleid = 0) {
-        this.points = [];
-        this.styleid = styleid;
-        this.rect = notebook.utils.Rect.empty();
-        this.selected = false;
-        this.canvas = null;
-        this.pos = notebook.utils.Point.zero();
-    }
-    Stroke.prototype.push = function (point) {
-        this.points.push(point);
-        this.rect.add(point.x + this.pos.x, point.y + this.pos.y);
-        this.canvas.add_dirty_rect(this.rect);
-    }
-    Stroke.prototype.set_selected = function (selected) {
-        if (this.selected === selected) return;
+    class Stroke extends notebook.CanvasObj {
 
-        this.selected = selected;
-        this.canvas.add_dirty_rect(this.rect);
-        if (selected) this.canvas.selected.push(this)
-        else this.canvas.selected.splice(this.canvas.selected.indexOf(this), 1);
-    }
-    Stroke.prototype.draw = function (ctx, dirty_rect, styleid) {
-        styleid = styleid || this.styleid;
-
-        if (styleid != 'selected' && this.selected) {
-            this.draw(ctx, dirty_rect, 'selected'); //selected outline
+        constructor(styleid = 0) {
+            super();
+            this.points = [];
+            this.styleid = styleid;
         }
 
-        if (this.rect.x2 < dirty_rect.x1 || this.rect.x1 > dirty_rect.x2 ||
-            this.rect.y2 < dirty_rect.y1 || this.rect.y1 > dirty_rect.y2) return;
-
-        var tension = notebook.Config.tension;
-        var calc_width = notebook.stroke_styles.styles[styleid].calc_width;
-
-        if (this.points.length == 1) {
-            ctx.beginPath();
-            notebook.stroke_styles.styles[styleid].apply_style(ctx);
-            ctx.arc(this.points[0].x + this.pos.x, this.points[0].y + this.pos.y, calc_width(this.points.pressure * 2), 0, Math.PI * 2);
-            ctx.fill();
+        push(point) {
+            this.points.push(point);
+            this.rect.add(point.pos.x + this.pos.x, point.pos.y + this.pos.y);
+            this.canvas.add_dirty_rect(this.rect);
         }
 
-        ctx.lineCap = 'round';
-        for (let i = 0; i < this.points.length - 1; i++) {
-            const p0 = i > 0 ? this.points[i - 1] : this.points[0];
-            const p1 = this.points[i];
-            const p2 = this.points[i + 1];
-            const p3 = i < this.points.length - 2 ? this.points[i + 2] : p2;
+        set_selected(selected) {
+            if (this.selected === selected) return;
 
-            if (!dirty_rect.in(p1.x + this.pos.x, p1.y + this.pos.y) && !dirty_rect.in(p2.x + this.pos.x, p2.y + this.pos.y)) continue;
-
-            // 计算三次贝塞尔控制点
-            const cp1x = p1.x + (p2.x - p0.x) * tension / 3;
-            const cp1y = p1.y + (p2.y - p0.y) * tension / 3;
-            const cp2x = p2.x - (p3.x - p1.x) * tension / 3;
-            const cp2y = p2.y - (p3.y - p1.y) * tension / 3;
-
-            ctx.beginPath();
-            ctx.moveTo(p1.x + this.pos.x, p1.y + this.pos.y);
-            ctx.lineWidth = calc_width((p1.pressure + p2.pressure) / 2);
-            ctx.bezierCurveTo(cp1x + this.pos.x, cp1y + this.pos.y, cp2x + this.pos.x, cp2y + this.pos.y, p2.x + this.pos.x, p2.y + this.pos.y);
-            notebook.stroke_styles.styles[styleid].apply_style(ctx);
-            ctx.stroke();
+            this.selected = selected;
+            this.canvas.add_dirty_rect(this.rect);
+            if (selected) this.canvas.selected.push(this)
+            else {
+                const index = this.canvas.selected.indexOf(this);
+                if (index > -1) this.canvas.selected.splice(index, 1);
+            }
         }
 
-        if (notebook.Config.debug) {
-            ctx.fillStyle = 'red';
-            for (let p of this.points) {
+        draw(ctx, dirty_rect, styleid) {
+            styleid = styleid || this.styleid;
+
+            if (styleid != 'selected' && this.selected) {
+                this.draw(ctx, dirty_rect, 'selected'); //selected outline
+            }
+            console.log(dirty_rect)
+            if (this.rect.x2 < dirty_rect.x1 || this.rect.x1 > dirty_rect.x2 ||
+                this.rect.y2 < dirty_rect.y1 || this.rect.y1 > dirty_rect.y2) return;
+
+            var tension = notebook.Config.tension;
+            var calc_width = notebook.stroke_styles.styles[styleid].calc_width;
+
+            if (this.points.length == 1) {
                 ctx.beginPath();
-                ctx.arc(p.x + this.pos.x, p.y + this.pos.y, 1, 0, Math.PI * 2);
+                notebook.stroke_styles.styles[styleid].apply_style(ctx);
+                ctx.arc(this.points[0].pos.x + this.pos.x, this.points[0].pos.y + this.pos.y, calc_width(this.points[0].pressure * 2), 0, Math.PI * 2);
                 ctx.fill();
             }
-        }
-    }
-    Stroke.prototype.simplify = function () {
-        var stroke = [], d = notebook.Config.reserved_end_point_number;
-        if (this.points.length <= d * 2) return;
 
-        for (var i = 0; i < d; i++)stroke.push(this.points[i].copy());
-        var text = '';
-        for (var i = d; i < this.points.length - d - 1; i++) {
-            var p = this.points[i], lp = stroke[stroke.length - 1];
-            if (notebook.utils.distance(p.x, p.y, lp.x, lp.y) >= notebook.Config.min_point_distance) {
-                stroke.push(p.copy());
-            } else {
-                text += ('point skipped' + ' distance:' + ',' + notebook.utils.distance(p.x, p.y, lp.x, lp.y) + '<br>')
+            ctx.lineCap = 'round';
+            for (let i = 0; i < this.points.length - 1; i++) {
+                const p0 = i > 0 ? this.points[i - 1] : this.points[0];
+                const p1 = this.points[i];
+                const p2 = this.points[i + 1];
+                const p3 = i < this.points.length - 2 ? this.points[i + 2] : p2;
+
+                if (!dirty_rect.in(p1.pos.add(this.pos)) && !dirty_rect.in(p2.pos.add(this.pos))) continue;
+
+                // 计算三次贝塞尔控制点
+                const cp1x = p1.pos.x + (p2.pos.x - p0.pos.x) * tension / 3;
+                const cp1y = p1.pos.y + (p2.pos.y - p0.pos.y) * tension / 3;
+                const cp2x = p2.pos.x - (p3.pos.x - p1.pos.x) * tension / 3;
+                const cp2y = p2.pos.y - (p3.pos.y - p1.pos.y) * tension / 3;
+
+                ctx.beginPath();
+                ctx.moveTo(p1.pos.x + this.pos.x, p1.pos.y + this.pos.y);
+
+                ctx.lineWidth = calc_width((p1.pressure + p2.pressure) / 2);
+                ctx.bezierCurveTo(cp1x + this.pos.x, cp1y + this.pos.y, cp2x + this.pos.x, cp2y + this.pos.y, p2.pos.x + this.pos.x, p2.pos.y + this.pos.y);
+
+                notebook.stroke_styles.styles[styleid].apply_style(ctx);
+                ctx.stroke();
+            }
+
+            if (notebook.Config.debug) {
+                ctx.fillStyle = 'red';
+                for (let p of this.points) {
+                    ctx.beginPath();
+                    ctx.arc(p.x + this.pos.x, p.y + this.pos.y, 1, 0, Math.PI * 2);
+                    ctx.fill();
+                }
             }
         }
-        // if(confirm())document.writeln(text);
-        for (var i = this.points.length - d; i < this.points.length; i++)stroke.push(this.points[i].copy());
-        this.points = stroke;
-    }
-    Stroke.prototype.calc_rect = function () {
-        var rect = notebook.utils.Rect.empty();
-        for (var point of this.points) {
-            rect.add(point.x + this.pos.x, point.y + this.pos.y);
+
+        simplify() {
+            var stroke = [], d = notebook.Config.reserved_end_point_number;
+            if (this.points.length <= d * 2) return;
+
+            for (var i = 0; i < d; i++)stroke.push(this.points[i].copy());
+            var text = '';
+            for (var i = d; i < this.points.length - d - 1; i++) {
+                var p = this.points[i], lp = stroke[stroke.length - 1];
+                if (notebook.utils.distance(p.pos.x, p.pos.y, lp.pos.x, lp.pos.y) >= notebook.Config.min_point_distance) {
+                    stroke.push(p.copy());
+                } else {
+                    text += ('point skipped' + ' distance:' + ',' + notebook.utils.distance(p.pos.x, p.pos.y, lp.pos.x, lp.pos.y) + '<br>')
+                }
+            }
+            // if(confirm())document.writeln(text);
+            for (var i = this.points.length - d; i < this.points.length; i++)stroke.push(this.points[i].copy());
+            this.points = stroke;
         }
-        this.rect = rect;
-    }
-    Stroke.prototype.collide_circle = function (x, y, r) {
-        // Quick bounding box check
-        if (x + r < this.rect.x1 || x - r > this.rect.x2 || y + r < this.rect.y1 || y - r > this.rect.y2)
+
+        calc_rect() {
+            var rect = notebook.utils.Rect.empty();
+            for (var point of this.points) {
+                rect.add(point.pos.x + this.pos.x, point.pos.y + this.pos.y);
+            }
+            this.rect = rect;
+        }
+
+        collide_circle(x, y, r) {
+            // Quick bounding box check
+            if (x + r < this.rect.x1 || x - r > this.rect.x2 || y + r < this.rect.y1 || y - r > this.rect.y2)
+                return false;
+
+            // Adjust coordinates to stroke's position
+            x -= this.pos.x;
+            y -= this.pos.y;
+
+            // Check each segment
+            for (let i = 0; i < this.points.length - 1; i++) {
+                const p1 = this.points[i].pos;
+                const p2 = this.points[i + 1].pos;
+                if (notebook.utils.distance_to_line(x, y, p1.x, p1.y, p2.x, p2.y) < r) return true;
+            }
+            if (this.points.length == 1 && notebook.utils.distance(x, y, this.points[0].pos.x, this.points[0].pos.y) < r) return true;
+
             return false;
-
-        // Adjust coordinates to stroke's position
-        x -= this.pos.x;
-        y -= this.pos.y;
-
-        // Check each segment
-        for (let i = 0; i < this.points.length - 1; i++) {
-            const p1 = this.points[i];
-            const p2 = this.points[i + 1];
-            if (notebok.utils.distance_to_line(x, y, p1.x, p1.y, p2.x, p2.y) < r) return true;
         }
-        if (this.points.length == 1 && notebook.utils.distance(x, y, this.points[0].x, this.points[0].y) < r) return true;
-        return false;
-    }
-    Stroke.prototype.fast_collide_rect = function (rect) {
-        return this.rect.collide_rect(rect);
-    }
-    Stroke.prototype.collide_path = function (ctx) {
-        for (var p of this.points)
-            if (!ctx.isPointInPath(p.x + this.pos.x, p.y + this.pos.y)) return false;
-        return true;
-    }
-    Stroke.prototype.move = function (dx, dy) {
-        this.pos.x += dx;
-        this.pos.y += dy;
-        this.rect.move(dx, dy)
-    }
-    Stroke.prototype.save = function () {
-        var data = {
-            points: this.points.map(p => ({ x: p.x, y: p.y, pressure: p.pressure })),
-            styleid: this.styleid,
-            pos: { x: this.pos.x, y: this.pos.y }
-        };
-        return data;
-    }
-    Stroke.prototype.load = function (data) {
-        this.styleid = data.styleid;
-        for (var p of data.points) this.points.push(new notebook.StrokePoint(p.x, p.y, p.pressure));
-        this.pos = new notebook.utils.Point(data.pos.x, data.pos.y);
-        this.calc_rect();
+
+
+        collide_path(ctx) {
+            for (var p of this.points)
+                if (!ctx.isPointInPath(p.pos.x + this.pos.x, p.pos.y + this.pos.y)) return false;
+            return true;
+        }
+
+        save() {
+            var data = {
+                points: this.points.map(p => ({ x: p.pos.x, y: p.pos.y, pressure: p.pressure })),
+
+                styleid: this.styleid,
+                pos: { x: this.pos.x, y: this.pos.y }
+            };
+            return data;
+        }
+
+        load(data) {
+            this.styleid = data.styleid;
+            for (var p of data.points) this.points.push(new notebook.StrokePoint(p.pos, p.pressure));
+            this.pos = new notebook.utils.Point(data.pos.x, data.pos.y);
+            this.calc_rect();
+        }
     }
     notebook.Stroke = Stroke;
 })();
