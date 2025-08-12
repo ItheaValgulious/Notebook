@@ -32,13 +32,12 @@
         save() {
             virtual_func_error();
         }
-        load(obj) {
+        static load(obj) {
             virtual_func_error();
         }
         on_add_to_canvas() {
             
         }
-
     }
     notebook.CanvasObj = CanvasObj;
 

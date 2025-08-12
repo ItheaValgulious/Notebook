@@ -132,10 +132,6 @@
         this.lastpos = point;
         this.sum = notebook.utils.Point.zero();
         for (var obj of canvas.objects) {
-            console.log(obj.rect);
-            console.log(point);
-            console.log(obj instanceof notebook.MarkdownArea);
-
             if (obj instanceof notebook.MarkdownArea && obj.rect.in(point)) {
                 this.mode = 'edit';
                 this.markdown = obj;

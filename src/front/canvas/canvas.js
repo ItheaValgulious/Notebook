@@ -116,14 +116,20 @@
     }
     Canvas.prototype.load = function (text) {
         var data = JSON.parse(text);
-
         this.pos.x = data.pos.x;
         this.pos.y = data.pos.y;
         this.objects = [];
         for (var o of data.objects) {
-            var s = new notebook.Stroke();
-            s.load(o);
-            this.add_object(s);
+            if (o.type == 'stroke') {
+                var stroke = notebook.Stroke.load(o);
+                this.add_object(stroke);
+            }
+            else if (o.type == 'markdown') {
+                var markdown = notebook.MarkdownArea.load(o);
+                this.add_object(markdown);
+            }
+
+
         }
         notebook.stroke_styles.load(data.styles);
 

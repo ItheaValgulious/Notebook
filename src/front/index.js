@@ -1,3 +1,4 @@
+
 window.onload = () => {
     notebook.Config.canvas_width = window.innerWidth;
     notebook.Config.canvas_height = window.innerHeight;

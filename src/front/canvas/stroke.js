@@ -31,12 +31,12 @@
             if (styleid != 'selected' && this.selected) {
                 this.draw(ctx, dirty_rect, 'selected'); //selected outline
             }
-            console.log(dirty_rect)
             if (this.rect.x2 < dirty_rect.x1 || this.rect.x1 > dirty_rect.x2 ||
                 this.rect.y2 < dirty_rect.y1 || this.rect.y1 > dirty_rect.y2) return;
 
             var tension = notebook.Config.tension;
-            var calc_width = notebook.stroke_styles.styles[styleid].calc_width;
+            var calc_width = notebook.stroke_styles.styles[styleid].calc_width.bind(notebook.stroke_styles.styles[styleid]);
+
 
             if (this.points.length == 1) {
                 ctx.beginPath();
@@ -137,6 +137,7 @@
         save() {
             var data = {
                 points: this.points.map(p => ({ x: p.pos.x, y: p.pos.y, pressure: p.pressure })),
+                type: 'stroke',
 
                 styleid: this.styleid,
                 pos: { x: this.pos.x, y: this.pos.y }
@@ -144,11 +145,13 @@
             return data;
         }
 
-        load(data) {
-            this.styleid = data.styleid;
-            for (var p of data.points) this.points.push(new notebook.StrokePoint(p.pos, p.pressure));
-            this.pos = new notebook.utils.Point(data.pos.x, data.pos.y);
-            this.calc_rect();
+        static load(data) {
+            var stroke = new Stroke(data.styleid);
+            stroke.pos = new notebook.utils.Point(data.pos.x, data.pos.y);
+            for(var p of data.points)
+                stroke.points.push(new notebook.StrokePoint(new notebook.utils.Point(p.x, p.y), p.pressure));
+            stroke.calc_rect();
+            return stroke;
         }
     }
     notebook.Stroke = Stroke;
