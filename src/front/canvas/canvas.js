@@ -144,6 +144,7 @@
         this.content_container.style.top = -this.pos.y / this.dp + 'px';
     }
     Canvas.prototype.remove_object = function (object) {
+        if(object.selected)object.set_selected(false);
         var index = this.objects.indexOf(object);
         if (index != -1) {
             this.objects.splice(index, 1);

@@ -59,7 +59,7 @@
             if (this.vditor.vditor)
                 this.vditor.focus();
             else
-                waiter = new notebook.utils.Waiter(() => { return this.vditor.vditor != undefined }, () => { this.vditor.focus(); });
+                var waiter = new notebook.utils.Waiter(() => { return this.vditor.vditor != undefined }, () => { this.vditor.focus(); });
         }
 
         save() {
