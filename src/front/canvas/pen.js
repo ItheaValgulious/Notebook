@@ -8,11 +8,12 @@
         Pen.pens[name] = this;
     }
     Pen.pens = {};
-    var pencil = new Pen('pencil', ['pen', 'mouse']),
-        eraser = new Pen('eraser', ['pen', 'mouse']),
-        selector = new Pen('selector', ['pen', 'mouse']);
-    var touch_mover = new Pen('touch_mover', ['touch', 'mouse']);
-    var markdown_creator = new Pen('markdown_creator', ['pen', 'mouse']);
+    var pencil = new Pen('pencil', ['pen']),
+        eraser = new Pen('eraser', ['pen']),
+        selector = new Pen('selector', ['pen']);
+    var touch_mover = new Pen('touch_mover', ['touch']);
+    var markdown_creator = new Pen('markdown_creator', ['pen']);
+    var image_creator = new Pen('image_creator', ['pen']);
 
     pencil.on_begin = function (canvas, event, point) {
         this.current_stroke = new notebook.Stroke(notebook.Env.current_style);
@@ -174,6 +175,12 @@
         this.markdown = null;
     }.bind(markdown_creator);
 
+    image_creator.on_end = function (canvas, event, point) {
+        var value = `![image](${notebook.Env.image_creator.url})`;
+        var md = new notebook.MarkdownArea(point, notebook.Config.default_markdown_width, notebook.Config.default_markdown_height,value);
+        canvas.add_object(md);
+        notebook.Env.image_creator.url = '';
+    }.bind(image_creator)
 
 
 

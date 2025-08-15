@@ -3,6 +3,7 @@ window.onload = () => {
     notebook.Config.canvas_width = window.innerWidth;
     notebook.Config.canvas_height = window.innerHeight;
     // notebook.init_menu();
+    notebook.picbed.init();
     notebook.init_toolbar();
     notebook.tree.init();
     notebook.canvas = new notebook.Canvas();

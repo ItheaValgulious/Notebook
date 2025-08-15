@@ -1,4 +1,4 @@
-const { app, BrowserWindow,ipcMain } = require('electron/main')
+const { app, BrowserWindow, ipcMain } = require('electron/main')
 const { FileSystem, Dialoger } = require('./src/back/system')
 
 var file_system = new FileSystem();
@@ -15,6 +15,9 @@ ipcMain.handle('read_folder', async (event, folderPath) => {
     return await file_system.load_folder(folderPath);
 });
 
+ipcMain.handle('read_blob', async (event, filePath) => {
+    return await file_system.open_blob(filePath);
+});
 ipcMain.handle('show-open-dialog', async () => {
     return await dialoger.openFileDialog();
 });

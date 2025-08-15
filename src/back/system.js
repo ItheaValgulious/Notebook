@@ -1,4 +1,4 @@
-import fs from 'fs'
+import fs, { readFileSync } from 'fs'
 import path from 'path'
 import { dialog } from 'electron'
 
@@ -89,6 +89,10 @@ export class FileSystem {
 
     open(filePath) {
         return fs.readFileSync(filePath, 'utf8');
+    }
+
+    open_blob(filePath) {
+        return fs.readFileSync(filePath);
     }
 
     new_folder(folderPath) {

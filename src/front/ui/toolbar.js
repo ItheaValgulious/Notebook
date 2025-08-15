@@ -34,7 +34,15 @@
 
         new UIButton('lasso', 'lasso', () => { notebook.Env.current_pen['pen'] = 'selector'; }),
 
-        new UIButton('image', 'image'),
+        new UIButton('image', 'image', async () => {
+            const file = await window.api.showOpenDialog();
+            if (file) {
+                const blob = await window.api.read_blob(file);
+                const url = (await notebook.picbed.upload(blob)).url;
+                notebook.Env.current_pen['pen'] = 'image_creator';
+                notebook.Env.image_creator.url = url;
+            }
+        }),
         new UIButton('markdown', 'markdown', () => { notebook.Env.current_pen['pen'] = 'markdown_creator'; }),
 
         new UIButton('setting', 'setting'),

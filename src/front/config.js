@@ -16,7 +16,14 @@
         default_markdown_width: 500,
         default_markdown_height: 500,
         select_color: 'rgba(98, 145, 255, 0.79)',
-        empty_file_template: { objects: [], styles: {}, pos: { x: 0, y: 0 } }
+        empty_file_template: { objects: [], styles: {}, pos: { x: 0, y: 0 } },
+
+        picbed: {
+            enable: false,
+            token: '',
+            user: '',
+            repo: ''
+        }
     };
     window.notebook.Env = {
         current_pen: {
@@ -27,6 +34,16 @@
         eraser_radius: 10,
         current_pointer_type: null,
         current_style: 'pen1',
-        current_file: null
+        current_file: null,
+        image_creator:{
+            url:''
+        }
     };
+    window.api.read_file('settings.json').then((data) => {
+        var settings = JSON.parse(data);
+        for (var key in settings) {
+            window.notebook.Config[key] = settings[key];
+        }
+    })
+
 })();
