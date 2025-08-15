@@ -24,6 +24,7 @@
         parentNode = parentNode || document.body;
 
         this.canvas = document.createElement('canvas');
+        this.canvas.classList.add('notebook_canvas');
         this.ctx = this.canvas.getContext('2d');
         this.canvas.width = this.width * this.dp;
         this.canvas.height = this.height * this.dp;
@@ -40,7 +41,12 @@
 
         function pointer_begin(event) {
             var pointerType = event.pointerType;
-            if (notebook.Config.debug && pointerType == 'mouse') pointerType = 'pen';
+            if (pointerType == 'mouse' && event.button == 0) {
+                pointerType = 'touch';
+            } else if (event.button == 2) {
+                pointerType = 'pen';
+            }
+
             this.canvas.addEventListener('pointermove', pointer_move);
             this.canvas.addEventListener('pointerup', pointer_end);
 
@@ -49,7 +55,8 @@
         }
         function pointer_move(ev) {
             var pointerType = ev.pointerType;
-            if (notebook.Config.debug && pointerType == 'mouse') pointerType = 'pen';
+            if (pointerType == 'mouse') pointerType = notebook.Env.current_pointer_type;
+
             if (notebook.Env.current_pointer_type != pointerType) return;
 
             var events;
@@ -62,8 +69,7 @@
         }
         function pointer_end(event) {
             var pointerType = event.pointerType;
-
-            if (notebook.Config.debug && pointerType == 'mouse') pointerType = 'pen';
+            if (pointerType == 'mouse') pointerType = notebook.Env.current_pointer_type;
             if (notebook.Env.current_pointer_type != pointerType) return;
 
             this.canvas.removeEventListener('pointerup', pointer_end);
@@ -144,7 +150,7 @@
         this.content_container.style.top = -this.pos.y / this.dp + 'px';
     }
     Canvas.prototype.remove_object = function (object) {
-        if(object.selected)object.set_selected(false);
+        if (object.selected) object.set_selected(false);
         var index = this.objects.indexOf(object);
         if (index != -1) {
             this.objects.splice(index, 1);

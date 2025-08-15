@@ -25,12 +25,14 @@
             }
         }
 
-        draw(ctx, dirty_rect, styleid) {
+        _draw(ctx, dirty_rect, styleid) {
+            dirty_rect.x1-=notebook.Config.dirty_bias;
+            dirty_rect.x2+=notebook.Config.dirty_bias;
+            dirty_rect.y1-=notebook.Config.dirty_bias;
+            dirty_rect.y2+=notebook.Config.dirty_bias;
+
             styleid = styleid || this.styleid;
 
-            if (styleid != 'selected' && this.selected) {
-                this.draw(ctx, dirty_rect, 'selected'); //selected outline
-            }
             if (this.rect.x2 < dirty_rect.x1 || this.rect.x1 > dirty_rect.x2 ||
                 this.rect.y2 < dirty_rect.y1 || this.rect.y1 > dirty_rect.y2) return;
 
@@ -79,6 +81,13 @@
                 }
             }
         }
+        draw(ctx,dirty_rect) {
+            if(this.selected){
+                this._draw(ctx,dirty_rect,notebook.stroke_styles.get_selected_style(this.styleid));
+            }
+            this._draw(ctx,dirty_rect);
+        }
+
 
         simplify() {
             var stroke = [], d = notebook.Config.reserved_end_point_number;

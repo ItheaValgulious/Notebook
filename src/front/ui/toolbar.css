@@ -1,0 +1,194 @@
+.toolbar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 50px;
+    height: 100vh;
+    background-color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 10px;
+    box-sizing: border-box;
+    z-index: 1;
+}
+
+.toolbar button {
+    width: 40px;
+    height: 40px;
+    margin: 5px 0;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    position: relative;
+}
+
+.toolbar button:hover {
+    background-color: #555;
+}
+
+.toolbar button.active {
+    background-color: #007bff;
+}
+
+.toolbar .divider {
+    width: 80%;
+    height: 1px;
+    background-color: #666;
+    margin: 10px 0;
+}
+
+.dropdown {
+    position: absolute;
+    left: 50px;
+    background-color: #444;
+    min-width: 120px;
+    display: none;
+    z-index: 100;
+}
+
+.dropdown.show {
+    display: block;
+}
+
+.dropdown div {
+    padding: 10px;
+    color: white;
+    cursor: pointer;
+}
+
+.dropdown div:hover {
+    background-color: #666;
+}
+
+.tree-panel {
+    position: fixed;
+    left: 50px;
+    top: 0;
+    width: 200px;
+    height: 100vh;
+    background-color: #2a2a2a;
+    color: white;
+    display: none;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.tree-panel.show {
+    display: block;
+}
+
+.tree-panel .collapse-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    background-color: #555;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 12px;
+    border-radius: 3px;
+}
+
+.tree-node {
+    padding: 5px 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.tree-node:hover {
+    background-color: #444;
+}
+
+.tree-node .tree-icon {
+    margin-right: 5px;
+    font-size: 14px;
+    min-width: 14px;
+}
+
+.tree-node .tree-label {
+    font-size: 14px;
+    flex-grow: 1;
+}
+
+.tree-node .tree-toggle {
+    margin-right: 5px;
+    font-size: 12px;
+    width: 12px;
+    text-align: center;
+}
+
+.tree-node .tree-toggle::before {
+    content: '\f0da';
+    /* Right arrow (collapsed) */
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+}
+
+.tree-node.expanded .tree-toggle::before {
+    content: '\f0d7';
+    /* Down arrow (expanded) */
+}
+
+.tree-node.leaf .tree-toggle {
+    visibility: hidden;
+}
+
+.tree-children {
+    margin-left: 20px;
+    display: none;
+}
+
+.tree-node.expanded .tree-children {
+    display: block;
+}
+
+.config-panel {
+    position: absolute;
+    left: 50px;
+    background-color: #444;
+    padding: 10px;
+    display: none;
+    z-index: 100;
+}
+
+.config-panel.show {
+    display: block;
+}
+
+.color-wheel {
+    width: 100px;
+    height: 100px;
+    cursor: crosshair;
+    margin-bottom: 10px;
+    /* image-rendering: pixelated; */
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.slider {
+    width: 100px;
+    margin-right: 10px;
+}
+
+.slider-label {
+    color: white;
+    font-size: 12px;
+}
+
+.brush-preview {
+    border-radius: 50%;
+    display: inline-block;
+    vertical-align: middle;
+}

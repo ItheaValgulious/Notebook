@@ -33,15 +33,10 @@
         constructor() {
             this.styles = {};
             // 初始化默认样式
-            this.styles['pen1'] = new StrokeStyle('black', null, [1, 0, 5]);
-
-            this.styles['selected'] = new StrokeStyle('rgba(98, 145, 255, 0.79)', null,
-                [notebook.Config.selected_width * 2 + 1, 0, 5]
-            );
-            this.styles['select_chain'] = new StrokeStyle('rgba(98, 145, 255, 0.79)', [5],
+            this.styles['select_chain'] = new StrokeStyle(notebook.Config.select_color, [5],
                 [notebook.Config.selector_width, 0, 0]
             );
-            this.not_save = ['selected', 'select_chain'];
+            this.not_save = ['select_chain'];
         }
 
         save() {
@@ -64,6 +59,19 @@
                 style.load(data[name]);
                 this.styles[name] = style;
             }
+        }
+        _get_style(color,dash,coefficients){
+            var name = 'pen' + coefficients.join('.') + '_' + color + '_' + dash.join('.');
+            if (!this.styles[name]) this.styles[name] = new StrokeStyle(color, dash, coefficients);
+            return name;
+        }
+        get_style(color, width, dash) {
+            dash = dash || [];
+            return this._get_style(color,dash,[1 * width, 1 * width, 3 * width]);
+        }
+        get_selected_style(name) {
+            var old_style = this.styles[name];
+            return this._get_style(notebook.Config.select_color, old_style.dash, old_style.coefficients.map(x => x + 2 * notebook.Config.selected_width));
         }
     }
 
