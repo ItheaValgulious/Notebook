@@ -118,10 +118,9 @@
         data.objects = this.objects.map(function (o) { return o.save(); });
         data.styles = notebook.stroke_styles.save();
         data.pos = { x: this.pos.x, y: this.pos.y };
-        return JSON.stringify(data);
+        return data;
     }
-    Canvas.prototype.load = function (text) {
-        var data = JSON.parse(text);
+    Canvas.prototype.load = function (data) {
         this.pos.x = data.pos.x;
         this.pos.y = data.pos.y;
         this.objects = [];
@@ -138,6 +137,7 @@
         notebook.stroke_styles.load(data.styles);
         this.set_style();
         this.add_dirty_rect(notebook.utils.Rect.full().move(this.pos.x, this.pos.y));
+        this.content_container.innerHTML = '';
     }
     Canvas.prototype.move = function (dx, dy) {
         this.pos.x += dx;

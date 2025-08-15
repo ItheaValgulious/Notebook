@@ -1,5 +1,6 @@
 (function () {
 
+    notebook.toolbar = {};
     // UIButton class
     class UIButton {
         constructor(id, type, on_choose, on_config) {
@@ -409,149 +410,76 @@
         });
     }
 
-    // Initialize brushes function
-    function init_brushes(configs) {
-        configs.forEach((config, index) => {
-            const brushIndex = index + 1;
-            const brush = document.querySelector(`.brush[data-brush="${brushIndex}"]`);
 
-            const brushSize = document.getElementById(`brush-size-${brushIndex}`);
-            const lightnessSlider = document.getElementById(`lightness-${brushIndex}`);
+    notebook.toolbar.manager = {
+        select_brush(id) {
+            selectedTool = null;
+            document.querySelectorAll('.brush')[id].click();
+        },
+        save() {
+            const configs = [];
+            document.querySelectorAll('.brush').forEach((brush, index) => {
+                const brushIndex = index + 1;
+                const brushSize = document.getElementById(`brush-size-${brushIndex}`);
+                const color = brush.dataset.color;
 
-            const brushSizeLabel = document.getElementById(`brush-size-label-${brushIndex}`);
-            const lightnessLabel = document.getElementById(`lightness-label-${brushIndex}`);
+                // Parse HSL color string to extract h, s, l values
+                const hslMatch = color.match(/hsl\(([\d.]+),\s*([\d.]+)%,\s*([\d.]+)%\)/);
+                console.log(color);
+                let hslColor = [0, 0, 0];
+                if (hslMatch) {
+                    hslColor = [
+                        parseInt(hslMatch[1]),
+                        parseInt(hslMatch[2]),
+                        parseInt(hslMatch[3])
+                    ];
+                }
 
+                configs.push({
+                    color: hslColor,
+                    width: parseInt(brushSize.value)
+                });
+            });
+            return configs;
+        },
 
-            const color_str = `hsl(${config.color[0]},${config.color[1]}%,${config.color[2]}%)`;
+        load(configs) {
+            configs.forEach((config, index) => {
+                const brushIndex = index + 1;
+                const brush = document.querySelector(`.brush[data-brush="${brushIndex}"]`);
 
+                const brushSize = document.getElementById(`brush-size-${brushIndex}`);
+                const lightnessSlider = document.getElementById(`lightness-${brushIndex}`);
 
-            if (brush && config.color) {
-                brush.dataset.color = color_str;
-                brush.querySelector('.brush-preview').style.backgroundColor = color_str;
-            }
+                const brushSizeLabel = document.getElementById(`brush-size-label-${brushIndex}`);
+                const lightnessLabel = document.getElementById(`lightness-label-${brushIndex}`);
 
-            if (brushSize && config.width) {
-                brushSize.value = config.width;
-                updateBrushPreviewSize(brushIndex, config.width);
-                brushSizeLabel.innerText = "Width: " + config.width;
-            }
+                const color_str = `hsl(${config.color[0]},${config.color[1]}%,${config.color[2]}%)`;
 
-            if (lightnessSlider && config.color[2] !== undefined) {
-                lightnessSlider.value = config.color[2];
-                updateSliderLabel(`lightness-${brushIndex}`, `lightness-label-${brushIndex}`, "Lightness", config.color[2]);
+                if (brush && config.color) {
+                    brush.dataset.color = color_str;
+                    brush.querySelector('.brush-preview').style.backgroundColor = color_str;
+                }
 
-            }
-        });
+                if (brushSize && config.width) {
+                    brushSize.value = config.width;
+                    updateBrushPreviewSize(brushIndex, config.width);
+                    brushSizeLabel.innerText = "Width: " + config.width;
+                }
+
+                if (lightnessSlider && config.color[2] !== undefined) {
+                    lightnessSlider.value = config.color[2];
+                    updateSliderLabel(`lightness-${brushIndex}`, `lightness-label-${brushIndex}`, "Lightness", config.color[2]);
+
+                }
+            });
+        }
     }
 
-    function init_dom() {
-        var html_content = `
-            <button id = "file-btn" title = "File" > <i class="fas fa-file"></i></button>
-        <div class="dropdown" id="file-dropdown">
-            <div onclick="notebook.toolbar.events.new_file()"><i class="fas fa-file"></i> New</div>
-            <div onclick="notebook.toolbar.events.open_file()"><i class="fas fa-folder-open"></i> Open</div>
-            <div onclick="notebook.toolbar.events.save_file()"><i class="fas fa-save"></i> Save</div>
-            <div onclick="notebook.toolbar.events.open_folder()"><i class="fas fa-folder"></i> Open Folder</div>
-        </div>
-        <button id="tree-btn" title="Tree"><i class="fas fa-sitemap"></i></button>
-        <div class="tree-panel" id="tree-panel">
-            <button class="collapse-btn"><i class="fas fa-times"></i></button>
-            <div id="file-info"></div>
-            <div id="tree-content"></div>
-        </div>
-        <button id="setting-btn" data-brush="setting" title="Setting" style="display: none;">
-            <i class="fas fa-gear"></i>
-        </button>
-        <button id="mode-btn" data-brush="mode" title="Mode" style="display:none"><i class="fas fa-tools"></i></button>
-        <div class="dropdown" id="mode-dropdown">
-            <div onclick="notebook.toolbar.events.set_mode('page')"><i class="fas fa-file"></i> Page Mode</div>
-            <div onclick="notebook.toolbar.events.set_mode('board')"><i class="fas fa-folder-open"></i> Board Mode</div>
-            <div onclick="notebook.toolbar.events.set_mode('document')"><i class="fas fa-save"></i> Document Mode</div>
-        </div>
-        <div class="divider"></div>
-        <button class="brush" data-brush="1" title="Brush 1"><span class="brush-preview"></span></button>
-        <div class="config-panel" id="brush-config-1">
-            <canvas class="color-wheel" data-brush="1"></canvas>
-            <div class="slider-container">
-                <input type="range" class="slider" data-brush="1" id="brush-size-1" min="1" max="10" value="5">
-                <span class="slider-label" id="brush-size-label-1">Width: 5</span>
-            </div>
-            <div class="slider-container">
-                <input type="range" class="slider" data-brush="1" id="lightness-1" min="0" max="100" value="50">
-                <span class="slider-label" id="lightness-label-1">Lightness: 50</span>
-            </div>
-        </div>
-        <button class="brush" data-brush="2" title="Brush 2"><span class="brush-preview"></span></button>
-        <div class="config-panel" id="brush-config-2">
-            <canvas class="color-wheel" data-brush="2"></canvas>
-            <div class="slider-container">
-                <input type="range" class="slider" data-brush="2" id="brush-size-2" min="1" max="10" value="5">
-                <span class="slider-label" id="brush-size-label-2">Width: 5</span>
-            </div>
-            <div class="slider-container">
-                <input type="range" class="slider" data-brush="2" id="lightness-2" min="0" max="100" value="50">
-                <span class="slider-label" id="lightness-label-2">Lightness: 50</span>
-            </div>
-        </div>
-        <button class="brush" data-brush="3" title="Brush 3"><span class="brush-preview"></span></button>
-        <div class="config-panel" id="brush-config-3">
-            <canvas class="color-wheel" data-brush="3"></canvas>
-            <div class="slider-container">
-                <input type="range" class="slider" data-brush="3" id="brush-size-3" min="1" max="10" value="5">
-                <span class="slider-label" id="brush-size-label-3">Width: 5</span>
-            </div>
-            <div class="slider-container">
-                <input type="range" class="slider" data-brush="3" id="lightness-3" min="0" max="100" value="50">
-                <span class="slider-label" id="lightness-label-3">Lightness: 50</span>
-            </div>
-        </div>
-        <button class="brush" data-brush="4" title="Brush 4"><span class="brush-preview"></span></button>
-        <div class="config-panel" id="brush-config-4">
-            <canvas class="color-wheel" data-brush="4"></canvas>
-            <div class="slider-container">
-                <input type="range" class="slider" data-brush="4" id="brush-size-4" min="1" max="10" value="5">
-                <span class="slider-label" id="brush-size-label-4">Width: 5</span>
-            </div>
-            <div class="slider-container">
-                <input type="range" class="slider" data-brush="4" id="lightness-4" min="0" max="100" value="50">
-                <span class="slider-label" id="lightness-label-4">Lightness: 50</span>
-            </div>
-        </div>
-        <button class="brush" data-brush="5" title="Brush 5"><span class="brush-preview"></span></button>
-        <div class="config-panel" id="brush-config-5">
-            <canvas class="color-wheel" data-brush="5"></canvas>
-            <div class="slider-container">
-                <input type="range" class="slider" data-brush="5" id="brush-size-5" min="1" max="10" value="5">
-                <span class="slider-label" id="brush-size-label-5">Width: 5</span>
-            </div>
-            <div class="slider-container">
-                <input type="range" class="slider" data-brush="5" id="lightness-5" min="0" max="100" value="50">
-                <span class="slider-label" id="lightness-label-5">Lightness: 50</span>
-            </div>
-        </div>
-        <button id="eraser-btn" data-brush="eraser" title="Eraser"><i class="fas fa-eraser"></i></button>
-        <div class="config-panel" id="eraser-config">
-            <div class="slider-container">
-                <input type="range" class="slider" id="eraser-size" min="1" max="10" value="5">
-                <span class="slider-label" id="eraser-size-label">Width: 5</span>
-            </div>
-        </div>
-        <button id="lasso-btn" data-brush="lasso" title="Lasso"><i class="fas fa-draw-polygon"></i></button>
-        <div class="divider"></div>
-        <button id="image-btn" data-brush="image" title="Insert Image"><i class="fas fa-image"></i></button>
-        <button id="markdown-btn" data-brush="markdown" title="Insert Markdown"><i class="fas fa-code"></i></button>
-        `;
-        var dom = document.createElement('div');
-        dom.innerHTML = html_content;
-        dom.classList.add('toolbar');
-
-        document.body.appendChild(dom);
-    }
 
     function init_toolbar() {
-        init_dom();
         _init_toolbar();
-        init_brushes([
+        notebook.toolbar.manager.load([
             {
                 color: [0, 0, 0],
                 width: 3
@@ -577,26 +505,20 @@
     }
 
     notebook.init_toolbar = init_toolbar;
-    notebook.toolbar = {}
     notebook.toolbar.events = {
         open_file: async () => {
             if (notebook.canvas.objects.length) await notebook.file.save_file();
             await notebook.file.open_file();
-            notebook.toolbar.manager.select_brush(0);
         },
         new_file: async () => {
             if (notebook.canvas.objects.length) await notebook.file.save_file();
             await notebook.file.new_file();
-            notebook.toolbar.manager.select_brush(0);
         },
         save_file: notebook.file.save_file,
-        open_folder: notebook.file.open_folder,
+        open_folder: async () => {
+            await notebook.file.open_folder();
+            document.getElementById('tree-panel').classList.add('show');
+        },
         set_mode(mode) { }
-    }
-    notebook.toolbar.manager = {
-        select_brush(id) {
-            selectedTool = null;
-            document.querySelectorAll('.brush')[id].click();
-        }
     }
 })();

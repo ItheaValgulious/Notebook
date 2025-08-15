@@ -173,10 +173,8 @@
                     }
                     if (notebook.canvas.objects.length) notebook.file.save_file();
                     nodeDiv.classList.add('selected');
-                    const content = await window.api.read_file(obj.data.path);
-                    notebook.canvas.load(content);
-                    notebook.toolbar.manager.select_brush(0);
-                    notebook.Config.current_file = obj.data.path;
+
+                    notebook.file.open(obj.data.path);
                 },
                 on_right_click: (obj, nodeDiv, e) => {
                     if (obj.data.type == 'directory') {

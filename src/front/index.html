@@ -1,46 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Document</title>
-    <style>
-    </style>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <link rel="stylesheet" href="../lib/font-awesome.css">
 
+    <head>
+        <meta charset="UTF-8" />
+        <title>Document</title>
+        <style></style>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="stylesheet" href="../lib/vditor.css">
+        <link rel="stylesheet" href="../lib/font-awesome.css" />
 
-    <link rel="stylesheet" href="ui/toolbar.css">
-    <link rel="stylesheet" href="ui/index.css">
+        <link rel="stylesheet" href="../lib/vditor.css" />
 
-    
-    <script src="../lib/vditor.js"></script>
+        <link rel="stylesheet" href="ui/toolbar.css" />
+        <link rel="stylesheet" href="ui/index.css" />
 
-    <script src="config.js"></script>
-    
-    <script src="canvas/utils.js"></script>
+        <script src="../lib/vditor.js"></script>
 
-    <script src="canvas/canvas_obj.js"></script>
+        <script src="config.js"></script>
 
-    
-    <script src="canvas/stroke_style.js"></script>
-    <script src="canvas/stroke_point.js"></script>
-    <script src="canvas/stroke.js"></script>
-    <script src="canvas/canvas.js"></script>
-    <script src="canvas/markdown.js"></script>
-    <script src="canvas/pen.js"></script>
+        <script src="canvas/utils.js"></script>
 
+        <script src="canvas/canvas_obj.js"></script>
 
-    <script src="ui/info.js"></script>
-    <script src="ui/file.js"></script>
-    <script src="ui/rightmenu.js"></script>
-    <script src="ui/toolbar.js"></script>
-    <script src="ui/tree.js"></script>
+        <script src="canvas/stroke_style.js"></script>
+        <script src="canvas/stroke_point.js"></script>
+        <script src="canvas/stroke.js"></script>
+        <script src="canvas/canvas.js"></script>
+        <script src="canvas/markdown.js"></script>
+        <script src="canvas/pen.js"></script>
 
-    <script src="index.js"></script>
-</head>
-<body>
-</body>
+        <script src="ui/info.js"></script>
+        <script src="ui/file.js"></script>
+        <script src="ui/rightmenu.js"></script>
+        <script src="ui/toolbar.js"></script>
+        <script src="ui/tree.js"></script>
+
+        <script src="index.js"></script>
+    </head>
+
+    <body>
+        <div class="toolbar">
+            <button id="file-btn" title="File">
+                <i class="fas fa-file"></i></button>
+            <div class="dropdown" id="file-dropdown">
+                <div onclick="notebook.toolbar.events.new_file()">
+                    <i class="fas fa-file"></i>
+                    New
+                </div>
+                <div onclick="notebook.toolbar.events.open_file()">
+                    <i class="fas fa-folder-open"></i>
+                    Open
+                </div>
+                <div onclick="notebook.toolbar.events.save_file()">
+                    <i class="fas fa-save"></i>
+                    Save
+                </div>
+                <div onclick="notebook.toolbar.events.open_folder()">
+                    <i class="fas fa-folder"></i>
+                    Open Folder
+                </div>
+            </div>
+            <button id="tree-btn" title="Tree">
+                <i class="fas fa-sitemap"></i></button>
+            <div class="tree-panel" id="tree-panel">
+                <button class="collapse-btn">
+                    <i class="fas fa-times"></i></button>
+                <div id="file-info"></div>
+                <div id="tree-content"></div>
+            </div>
+            <button id="setting-btn" data-brush="setting" title="Setting" style="display: none">
+                <i class="fas fa-gear"></i>
+            </button>
+            <button id="mode-btn" data-brush="mode" title="Mode" style="display: none">
+                <i class="fas fa-tools"></i>
+            </button>
+            <div class="dropdown" id="mode-dropdown">
+                <div onclick="notebook.toolbar.events.set_mode('page')">
+                    <i class="fas fa-file"></i> Page Mode
+                </div>
+                <div onclick="notebook.toolbar.events.set_mode('board')">
+                    <i class="fas fa-folder-open"></i> Board Mode
+                </div>
+                <div onclick="notebook.toolbar.events.set_mode('document')">
+                    <i class="fas fa-save"></i> Document Mode
+                </div>
+            </div>
+            <div class="divider"></div>
+            <button class="brush" data-brush="1" title="Brush 1">
+                <span class="brush-preview"></span>
+            </button>
+            <div class="config-panel" id="brush-config-1">
+                <canvas class="color-wheel" data-brush="1"></canvas>
+                <div class="slider-container">
+                    <input type="range" class="slider" data-brush="1" id="brush-size-1" min="1" max="10" value="5" />
+                    <span class="slider-label" id="brush-size-label-1">Width: 5</span>
+                </div>
+                <div class="slider-container">
+                    <input type="range" class="slider" data-brush="1" id="lightness-1" min="0" max="100" value="50" />
+                    <span class="slider-label" id="lightness-label-1">Lightness: 50</span>
+                </div>
+            </div>
+            <button class="brush" data-brush="2" title="Brush 2">
+                <span class="brush-preview"></span>
+            </button>
+            <div class="config-panel" id="brush-config-2">
+                <canvas class="color-wheel" data-brush="2"></canvas>
+                <div class="slider-container">
+                    <input type="range" class="slider" data-brush="2" id="brush-size-2" min="1" max="10" value="5" />
+                    <span class="slider-label" id="brush-size-label-2">Width: 5</span>
+                </div>
+                <div class="slider-container">
+                    <input type="range" class="slider" data-brush="2" id="lightness-2" min="0" max="100" value="50" />
+                    <span class="slider-label" id="lightness-label-2">Lightness: 50</span>
+                </div>
+            </div>
+            <button class="brush" data-brush="3" title="Brush 3">
+                <span class="brush-preview"></span>
+            </button>
+            <div class="config-panel" id="brush-config-3">
+                <canvas class="color-wheel" data-brush="3"></canvas>
+                <div class="slider-container">
+                    <input type="range" class="slider" data-brush="3" id="brush-size-3" min="1" max="10" value="5" />
+                    <span class="slider-label" id="brush-size-label-3">Width: 5</span>
+                </div>
+                <div class="slider-container">
+                    <input type="range" class="slider" data-brush="3" id="lightness-3" min="0" max="100" value="50" />
+                    <span class="slider-label" id="lightness-label-3">Lightness: 50</span>
+                </div>
+            </div>
+            <button class="brush" data-brush="4" title="Brush 4">
+                <span class="brush-preview"></span>
+            </button>
+            <div class="config-panel" id="brush-config-4">
+                <canvas class="color-wheel" data-brush="4"></canvas>
+                <div class="slider-container">
+                    <input type="range" class="slider" data-brush="4" id="brush-size-4" min="1" max="10" value="5" />
+                    <span class="slider-label" id="brush-size-label-4">Width: 5</span>
+                </div>
+                <div class="slider-container">
+                    <input type="range" class="slider" data-brush="4" id="lightness-4" min="0" max="100" value="50" />
+                    <span class="slider-label" id="lightness-label-4">Lightness: 50</span>
+                </div>
+            </div>
+            <button class="brush" data-brush="5" title="Brush 5">
+                <span class="brush-preview"></span>
+            </button>
+            <div class="config-panel" id="brush-config-5">
+                <canvas class="color-wheel" data-brush="5"></canvas>
+                <div class="slider-container">
+                    <input type="range" class="slider" data-brush="5" id="brush-size-5" min="1" max="10" value="5" />
+                    <span class="slider-label" id="brush-size-label-5">Width: 5</span>
+                </div>
+                <div class="slider-container">
+                    <input type="range" class="slider" data-brush="5" id="lightness-5" min="0" max="100" value="50" />
+                    <span class="slider-label" id="lightness-label-5">Lightness: 50</span>
+                </div>
+            </div>
+            <button id="eraser-btn" data-brush="eraser" title="Eraser">
+                <i class="fas fa-eraser"></i>
+            </button>
+            <div class="config-panel" id="eraser-config">
+                <div class="slider-container">
+                    <input type="range" class="slider" id="eraser-size" min="1" max="10" value="5" />
+                    <span class="slider-label" id="eraser-size-label">Width: 5</span>
+                </div>
+            </div>
+            <button id="lasso-btn" data-brush="lasso" title="Lasso">
+                <i class="fas fa-draw-polygon"></i>
+            </button>
+            <div class="divider"></div>
+            <button id="image-btn" data-brush="image" title="Insert Image">
+                <i class="fas fa-image"></i>
+            </button>
+            <button id="markdown-btn" data-brush="markdown" title="Insert Markdown">
+                <i class="fas fa-code"></i>
+            </button>
+        </div>
+    </body>
+
 </html>
