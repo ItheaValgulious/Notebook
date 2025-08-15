@@ -62,11 +62,11 @@ export class FileSystem {
 
         if (stats.isDirectory()) {
             const items = fs.readdirSync(currentPath);
-            const children = {};
+            const children = [];
             
             items.forEach(item => {
                 const fullPath = path.join(currentPath, item);
-                children[item] = this._scanDirectory(fullPath);
+                children.push(this._scanDirectory(fullPath));
             });
 
             return {
@@ -89,5 +89,47 @@ export class FileSystem {
 
     open(filePath) {
         return fs.readFileSync(filePath, 'utf8');
+    }
+
+    new_folder(folderPath) {
+        if (!fs.existsSync(folderPath)) {
+            fs.mkdirSync(folderPath, { recursive: true });
+            return true;
+        }
+        return false;
+    }
+
+    delete(filePath) {
+        if (fs.existsSync(filePath)) {
+            const stats = fs.statSync(filePath);
+            if (stats.isDirectory()) {
+                fs.rmSync(filePath, { recursive: true, force: true });
+            } else {
+                fs.unlinkSync(filePath);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    rename(oldPath, newName) {
+        if (!fs.existsSync(oldPath)) {
+            return false;
+        }
+        
+        const dirname = path.dirname(oldPath);
+        const newPath = path.join(dirname, newName);
+        
+        // 检查新名称是否已存在
+        if (fs.existsSync(newPath)) {
+            return false;
+        }
+        
+        try {
+            fs.renameSync(oldPath, newPath);
+            return true;
+        } catch (error) {
+            return false;
+        }
     }
 }

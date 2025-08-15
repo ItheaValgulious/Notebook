@@ -27,6 +27,18 @@ ipcMain.handle('show-folder-dialog', async () => {
     return await dialoger.selectFolderDialog();
 });
 
+ipcMain.handle('new_folder', async (event, folderPath) => {
+    return await file_system.new_folder(folderPath);
+});
+
+ipcMain.handle('delete', async (event, filePath) => {
+    return await file_system.delete(filePath);
+});
+
+ipcMain.handle('rename', async (event, oldPath, newName) => {
+    return await file_system.rename(oldPath, newName);
+});
+
 const createWindow = () => {
     const win = new BrowserWindow({
         fullscreen: true,

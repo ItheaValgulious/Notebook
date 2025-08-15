@@ -7,5 +7,8 @@ contextBridge.exposeInMainWorld('api', {
     read_folder: (path) => ipcRenderer.invoke('read_folder', path),
     showOpenDialog: () => ipcRenderer.invoke('show-open-dialog'),
     showSaveDialog: () => ipcRenderer.invoke('show-save-dialog'),
-    showFolderDialog: () => ipcRenderer.invoke('show-folder-dialog')
+    showFolderDialog: () => ipcRenderer.invoke('show-folder-dialog'),
+    new_folder: (path) => ipcRenderer.invoke('new_folder', path),
+    delete: (path) => ipcRenderer.invoke('delete', path),
+    rename: (oldPath, newName) => ipcRenderer.invoke('rename', oldPath, newName)
 });

@@ -26,6 +26,7 @@
         },
         eraser_radius: 10,
         current_pointer_type: null,
-        current_style: 'pen1'
+        current_style: 'pen1',
+        current_file: null
     };
 })();

@@ -10,101 +10,6 @@
         }
     }
 
-    // UITreePanel class
-    class UITreePanel {
-        constructor() {
-            this.dom = null;
-        }
-
-        init(dom) {
-            this.dom = dom;
-            this.dom.innerHTML = ''; // Clear existing content
-        }
-
-        set_tree(obj) {
-            if (!this.dom) return;
-            this.dom.innerHTML = ''; // Clear current tree
-            this.renderNode(obj, this.dom, 0);
-        }
-
-        renderNode(obj, parentDom, depth) {
-            const nodeDiv = document.createElement('div');
-            nodeDiv.classList.add('tree-node');
-            if (obj.children && obj.children.length > 0) {
-                nodeDiv.classList.add('expanded'); // Default to expanded
-            } else {
-                nodeDiv.classList.add('leaf');
-            }
-            nodeDiv.dataset.depth = depth;
-            nodeDiv.style.paddingLeft = `${depth * 20}px`;
-            nodeDiv.style.display = 'flex'; // Ensure visible by default
-
-            // Create toggle button for nodes with children
-            const toggle = document.createElement('span');
-            toggle.classList.add('tree-toggle');
-            nodeDiv.appendChild(toggle);
-
-            // Create icon
-            const icon = document.createElement('i');
-            icon.classList.add('tree-icon');
-            if (obj.icon) {
-                icon.className = `fas fa-${obj.icon} tree-icon`;
-            }
-            nodeDiv.appendChild(icon);
-
-            // Create label
-            const label = document.createElement('span');
-            label.classList.add('tree-label');
-            label.textContent = obj.label || 'Node';
-            nodeDiv.appendChild(label);
-
-            // Event listeners
-            toggle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const isExpanded = nodeDiv.classList.toggle('expanded');
-                let current = nodeDiv.nextElementSibling;
-                const myDepth = parseInt(nodeDiv.dataset.depth);
-                while (current) {
-                    const currentDepth = parseInt(current.dataset.depth);
-                    if (currentDepth <= myDepth) break;
-                    current.style.display = isExpanded ? 'flex' : 'none';
-                    current = current.nextElementSibling;
-                }
-            });
-
-            nodeDiv.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (obj.on_left_click) {
-                    obj.on_left_click(obj);
-                }
-            });
-
-            nodeDiv.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (obj.on_right_click) {
-                    obj.on_right_click(obj);
-                }
-            });
-
-            nodeDiv.addEventListener('dblclick', (e) => {
-                e.stopPropagation();
-                if (obj.on_double_click) {
-                    obj.on_double_click(obj);
-                }
-            });
-
-            parentDom.appendChild(nodeDiv);
-
-            // Render children as siblings
-            if (obj.children && obj.children.length > 0) {
-                obj.children.forEach(child => {
-                    this.renderNode(child, parentDom, depth + 1);
-                });
-            }
-        }
-    }
-
     function set_brush(obj) {
         notebook.Env.current_pen['pen'] = 'pencil';
         var style = notebook.stroke_styles.get_style(obj.color, obj.width, obj.dash);
@@ -119,12 +24,12 @@
 
     // Initialize UI buttons
     const uiButtons = [
-        new UIButton('brush-1', 'brush', set_brush),
-        new UIButton('brush-2', 'brush', set_brush),
-        new UIButton('brush-3', 'brush', set_brush),
-        new UIButton('brush-4', 'brush', set_brush),
-        new UIButton('brush-5', 'brush', set_brush),
-        new UIButton('eraser', 'eraser', set_eraser),
+        new UIButton('brush-1', 'brush', set_brush, set_brush),
+        new UIButton('brush-2', 'brush', set_brush, set_brush),
+        new UIButton('brush-3', 'brush', set_brush, set_brush),
+        new UIButton('brush-4', 'brush', set_brush, set_brush),
+        new UIButton('brush-5', 'brush', set_brush, set_brush),
+        new UIButton('eraser', 'eraser', set_eraser, set_eraser),
 
         new UIButton('lasso', 'lasso', () => { notebook.Env.current_pen['pen'] = 'selector'; }),
 
@@ -156,6 +61,8 @@
         const label = document.getElementById(labelId);
         label.textContent = `${prefix}: ${value}`;
     }
+
+    let selectedTool = null;
 
     //init all
     function _init_toolbar() {
@@ -254,6 +161,10 @@
             const rect = fileBtn.getBoundingClientRect();
             fileDropdown.style.top = `${rect.top}px`;
         });
+        fileDropdown.addEventListener('click', (e) => {
+            fileDropdown.classList.toggle('show');
+        });
+
 
         // Tree Panel
         const treeBtn = document.getElementById('tree-btn');
@@ -266,10 +177,6 @@
             treePanelDom.classList.remove('show');
         });
 
-        // Initialize Tree Panel
-        const treePanel = new UITreePanel();
-        treePanel.init(document.getElementById('tree-content'));
-
         // Tool Buttons (Brush, Eraser, Lasso, Image, Markdown, Setting, Mode)
 
         const toolButtons = [
@@ -281,7 +188,7 @@
             document.getElementById('setting-btn'),
             document.getElementById('mode-btn')
         ];
-        let selectedTool = null;
+        selectedTool = null;
 
         // Brush Buttons
         const brushes = document.querySelectorAll('.brush');
@@ -500,12 +407,6 @@
                 }
             });
         });
-
-
-        return {
-            uiButtons,
-            treePanel
-        };
     }
 
     // Initialize brushes function
@@ -547,14 +448,15 @@
         var html_content = `
             <button id = "file-btn" title = "File" > <i class="fas fa-file"></i></button>
         <div class="dropdown" id="file-dropdown">
-            <div onclick="notebook.toolbar.events.newFile()"><i class="fas fa-file"></i> New</div>
-            <div onclick="notebook.toolbar.events.openFile()"><i class="fas fa-folder-open"></i> Open</div>
-            <div onclick="notebook.toolbar.events.saveFile()"><i class="fas fa-save"></i> Save</div>
-            <div onclick="notebook.toolbar.events.openFolder()"><i class="fas fa-folder"></i> Open Folder</div>
+            <div onclick="notebook.toolbar.events.new_file()"><i class="fas fa-file"></i> New</div>
+            <div onclick="notebook.toolbar.events.open_file()"><i class="fas fa-folder-open"></i> Open</div>
+            <div onclick="notebook.toolbar.events.save_file()"><i class="fas fa-save"></i> Save</div>
+            <div onclick="notebook.toolbar.events.open_folder()"><i class="fas fa-folder"></i> Open Folder</div>
         </div>
         <button id="tree-btn" title="Tree"><i class="fas fa-sitemap"></i></button>
         <div class="tree-panel" id="tree-panel">
             <button class="collapse-btn"><i class="fas fa-times"></i></button>
+            <div id="file-info"></div>
             <div id="tree-content"></div>
         </div>
         <button id="setting-btn" data-brush="setting" title="Setting" style="display: none;">
@@ -671,52 +573,30 @@
                 width: 6
             }
         ]);
+        document.querySelectorAll('.brush')[0].click();
     }
 
     notebook.init_toolbar = init_toolbar;
     notebook.toolbar = {}
     notebook.toolbar.events = {
-        openFile: async () => {
-            try {
-                const filePath = await window.api.showOpenDialog();
-                if (filePath) {
-                    const content = await window.api.read_file(filePath);
-                    notebook.canvas.load(content);
-                }
-            } catch (error) {
-                console.error('Error while openning a file:', error);
-                info('Error while openning a file: ' + error);
-            }
+        open_file: async () => {
+            if (notebook.canvas.objects.length) await notebook.file.save_file();
+            await notebook.file.open_file();
+            notebook.toolbar.manager.select_brush(0);
         },
-        newFile() {
-            notebook.canvas.load(notebook.Config.empty_file_template);
+        new_file: async () => {
+            if (notebook.canvas.objects.length) await notebook.file.save_file();
+            await notebook.file.new_file();
+            notebook.toolbar.manager.select_brush(0);
         },
-        saveFile: async () => {
-            try {
-                const content = notebook.canvas.save();
-                const filePath = await window.api.showSaveDialog();
-                if (filePath) {
-                    info('File saved');
-                }
-            } catch (error) {
-                console.error('Error while saving a file:', error);
-                info('Error while saving a file: ' + error);
-            }
-        },
-        openFolder: async () => {
-            try {
-                const filePath = await window.api.showFolderDialog();
-                if(filePath){
-                    await window.api.read_folder(filePath);
-                    info('Folder opened');
-
-                }
-            } catch (error) {
-                console.error('Error while saving a folder:', error);
-                info('Error while saving a folder: ' + error);
-            }
-        },
+        save_file: notebook.file.save_file,
+        open_folder: notebook.file.open_folder,
         set_mode(mode) { }
     }
-
+    notebook.toolbar.manager = {
+        select_brush(id) {
+            selectedTool = null;
+            document.querySelectorAll('.brush')[id].click();
+        }
+    }
 })();
