@@ -5,10 +5,10 @@
         reserved_end_point_number: 3,
         canvas_width: 800,
         canvas_height: 600,
-        canvas_dp: 2,
+        canvas_dp: 3,
         dirty_bias: 30,
         debug: true,
-        show_dirty_rect: false,
+        show_dirty_rect: true,
         selected_width: 2,
         click_max_distance: 10,
         selector_width: 5,
@@ -16,6 +16,8 @@
         default_markdown_height: 500,
         select_color: 'rgba(98, 145, 255, 0.79)',
         empty_file_canvas_template: { objects: [], styles: {}, pos: { x: 0, y: 0 } },
+        min_scale: 0.2,
+        max_scale: 5,
     };
     window.notebook.Env = {
         current_pen: {

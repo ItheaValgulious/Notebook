@@ -46,6 +46,9 @@
         return p.x >= this.x1 && p.x <= this.x2 && p.y >= this.y1 && p.y <= this.y2;
     }
     Rect.prototype.add = function (x, y) {
+        if(this.is_empty()){
+            this.x1=this.x2=x,this.y1=this.y2=y;
+        }
         this.x1 = Math.min(this.x1, x);
         this.y1 = Math.min(this.y1, y);
         this.x2 = Math.max(this.x2, x);
@@ -77,6 +80,14 @@
         this.x2 = x2;
         this.y2 = y2;
     }
+    Rect.prototype.scale = function (k) {
+        this.w = (this.x2 - this.x1) * k;
+        this.h = (this.y2 - this.y1) * k;
+        this.x2 = this.x1 + this.w;
+        this.y2 = this.y1 + this.h;
+        return this;
+    }
+
 
 
     function Waiter(checker, action, interval = 100) {

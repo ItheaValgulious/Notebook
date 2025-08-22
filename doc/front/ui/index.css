@@ -1,5 +1,12 @@
-body {
+html{
+    position: fixed;
     overflow: hidden;
+}
+body {
+    position: fixed;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
     margin: 0;
 }
 
@@ -35,6 +42,7 @@ canvas.notebook_canvas {
     width: 100%;
     height: 100%;
     z-index: -1;
+    transform-origin: 0 0;
 }
 .markdown_area{
     position: absolute;

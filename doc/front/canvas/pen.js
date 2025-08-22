@@ -40,10 +40,12 @@
     }.bind(eraser);
 
     touch_mover.on_begin = function (canvas, event, point) {
-        this.lastpos = point.add(canvas.pos.mul(-1));
+        var factor=canvas.dp;
+        this.lastpos=new notebook.utils.Point(event.offsetX*factor,event.offsetY*factor);
     }.bind(touch_mover);
     touch_mover.on_move = function (canvas, event, point) {
-        point = point.add(canvas.pos.mul(-1));
+        var factor=canvas.dp;
+        point=new notebook.utils.Point(event.offsetX*factor,event.offsetY*factor);
         var dx = point.x - this.lastpos.x, dy = point.y - this.lastpos.y;
         canvas.move(-dx, -dy);
         this.lastpos = point;

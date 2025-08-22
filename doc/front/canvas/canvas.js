@@ -8,9 +8,10 @@
         this.canvas = null;
         this.content_container = null;
         this.ctx = null;
-        this.dirty_rect = notebook.utils.Rect.full();
         this.selected = [];
         this.pos = notebook.utils.Point.zero();
+        this.scale = 1;
+        this.dirty_rect = notebook.utils.Rect.full().scale(1 / this.scale).move(this.pos.x / this.scale, this.pos.y / this.scale);
     }
     Canvas.prototype.add_object = function (object) {
         this.objects.push(object);
@@ -18,9 +19,10 @@
         object.on_add_to_canvas();
     }
     Canvas.prototype.get_true_position = function (event) {
-        return new notebook.utils.Point((event.offsetX * this.dp + this.pos.x), (event.offsetY * this.dp + this.pos.y));
+        return new notebook.utils.Point((event.offsetX * this.dp + this.pos.x) / this.scale, (event.offsetY * this.dp + this.pos.y) / this.scale);
     }
     Canvas.prototype.init = function (parentNode) {
+
         parentNode = parentNode || document.body;
 
         this.canvas = document.createElement('canvas');
@@ -42,9 +44,9 @@
         this.canvas.oncontextmenu = function (event) {
             event.preventDefault(); // 禁用默认右键菜单
         };
-
+        var pid = null;
         function pointer_begin(event) {
-            event.preventDefault();
+            pid = event.pointerId;
             var pointerType = event.pointerType;
             if (pointerType == 'mouse' && event.button == 0) {
                 pointerType = 'touch';
@@ -59,7 +61,7 @@
             notebook.Env.current_pointer_type = pointerType;
         }
         function pointer_move(ev) {
-            ev.preventDefault();
+            if (ev.pointerId != pid) return;
             var pointerType = ev.pointerType;
             if (pointerType == 'mouse') pointerType = notebook.Env.current_pointer_type;
 
@@ -74,7 +76,7 @@
             }
         }
         function pointer_end(event) {
-            event.preventDefault();
+            if (event.pointerId != pid) return;
             var pointerType = event.pointerType;
             if (pointerType == 'mouse') pointerType = notebook.Env.current_pointer_type;
             if (notebook.Env.current_pointer_type != pointerType) return;
@@ -90,6 +92,43 @@
         pointer_end = pointer_end.bind(this);
 
         this.canvas.addEventListener('pointerdown', pointer_begin);
+
+        var touch_handler = {
+            canvas: this
+        };
+        touch_handler.handleTouchStart = function (event) {
+            if (event.touches.length === 2) {
+                // 计算两个触摸点之间的初始距离
+                const touch1 = event.touches[0];
+                const touch2 = event.touches[1];
+                this.initialDistance = Math.hypot(
+                    touch2.clientX - touch1.clientX,
+                    touch2.clientY - touch1.clientY
+                );
+            }
+        }.bind(touch_handler)
+        touch_handler.handleTouchMove = function (event) {
+            if (event.touches.length === 2) {
+                const touch1 = event.touches[0];
+                const touch2 = event.touches[1];
+                const currentDistance = Math.hypot(
+                    touch2.clientX - touch1.clientX,
+                    touch2.clientY - touch1.clientY
+                );
+
+                // 计算缩放比例
+                const scaleFactor = currentDistance / this.initialDistance;
+                // 调用 set_scale 方法设置缩放
+                this.canvas.set_scale(scaleFactor);
+                // 更新初始距离
+                this.initialDistance = currentDistance;
+            }
+        }.bind(touch_handler);
+
+        this.canvas.addEventListener('touchstart', touch_handler.handleTouchStart);
+        this.canvas.addEventListener('touchmove', touch_handler.handleTouchMove);
+
+
         this.render();
     }
     Canvas.prototype.render = function () {
@@ -97,6 +136,7 @@
         if (this.dirty_rect.is_empty()) return;
         this.ctx.save();
         this.ctx.translate(-this.pos.x, -this.pos.y);
+        this.ctx.scale(this.scale, this.scale);
 
         if (notebook.Config.debug && notebook.Config.show_dirty_rect) {
             this.ctx.strokeStyle = 'red';
@@ -117,6 +157,7 @@
         this.ctx.restore();
     }
     Canvas.prototype.add_dirty_rect = function (rect) {
+
         this.dirty_rect.add(rect.x1 - notebook.Config.dirty_bias, rect.y1 - notebook.Config.dirty_bias);
         this.dirty_rect.add(rect.x2 + notebook.Config.dirty_bias, rect.y2 + notebook.Config.dirty_bias);
     }
@@ -124,12 +165,14 @@
         var data = {};
         data.objects = this.objects.map(function (o) { return o.save(); });
         data.styles = notebook.stroke_styles.save();
-        data.pos = { x: this.pos.x, y: this.pos.y };
+        data.pos = { x: this.pos.x, y: this.pos.y, scale: this.scale };
+
         return data;
     }
     Canvas.prototype.load = function (data) {
         this.pos.x = data.pos.x;
         this.pos.y = data.pos.y;
+        this.scale = data.pos.scale || 1;
         this.objects = [];
         this.content_container.innerHTML = '';
         notebook.stroke_styles.load(data.styles);
@@ -145,17 +188,19 @@
                 this.add_object(markdown);
             }
         }
-        this.add_dirty_rect(notebook.utils.Rect.full().move(this.pos.x, this.pos.y));
+        this.add_dirty_rect(notebook.utils.Rect.full().scale(1 / this.scale).move(this.pos.x / this.scale, this.pos.y / this.scale));
+
     }
     Canvas.prototype.move = function (dx, dy) {
         this.pos.x += dx;
         this.pos.y += dy;
-        this.add_dirty_rect(notebook.utils.Rect.full().move(this.pos.x, this.pos.y));
+        this.add_dirty_rect(notebook.utils.Rect.full().scale(1 / this.scale).move(this.pos.x / this.scale, this.pos.y / this.scale));
         this.set_style();
     }
     Canvas.prototype.set_style = function () {
-        this.content_container.style.left = -this.pos.x / this.dp + 'px';
-        this.content_container.style.top = -this.pos.y / this.dp + 'px';
+        // this.content_container.style.left = -this.pos.x / this.dp + 'px';
+        // this.content_container.style.top = -this.pos.y / this.dp + 'px';
+        this.content_container.style.transform = 'translateX(' + (-this.pos.x / this.dp) + 'px) translateY(' + (-this.pos.y / this.dp) + 'px)' + 'scale(' + this.scale + ')';
     }
     Canvas.prototype.remove_object = function (object) {
         if (object.selected) object.set_selected(false);
@@ -166,7 +211,12 @@
             object.canvas = null;
         }
     }
-
+    Canvas.prototype.set_scale = function (scaleFactor) {
+        this.scale *= scaleFactor;
+        if (this.scale < notebook.Config.min_scale) this.scale = notebook.Config.min_scale;
+        if (this.scale > notebook.Config.max_scale) this.scale = notebook.Config.max_scale;
+        this.set_style();
+    }
 
     window.notebook.Canvas = Canvas;
 })();
