@@ -30,22 +30,37 @@
     }.bind(pencil);
 
     eraser.on_move = function (canvas, event, point) {
+        var delete_all_selected = false;
         for (var i = 0; i < canvas.objects.length; i++) {
-            var stroke = canvas.objects[i];
-            if (stroke.collide_circle(point.x, point.y, notebook.Env.eraser_radius)) {
-                canvas.remove_object(stroke);
-                i--;
+            var obj = canvas.objects[i];
+            if (obj.collide_circle(point.x, point.y, notebook.Env.eraser_radius)) {
+                if (!obj.selected) {
+                    canvas.remove_object(obj);
+                    i--;
+                } else {
+                    delete_all_selected = true;
+                    break;
+                }
+            }
+        }
+        if (delete_all_selected) {
+            var list=[];
+            for (var se of canvas.selected) 
+                list.push(se);
+            for(var obj of list){
+                obj.set_selected(false);
+                canvas.remove_object(obj);
             }
         }
     }.bind(eraser);
 
     touch_mover.on_begin = function (canvas, event, point) {
-        var factor=canvas.dp;
-        this.lastpos=new notebook.utils.Point(event.offsetX*factor,event.offsetY*factor);
+        var factor = canvas.dp;
+        this.lastpos = new notebook.utils.Point(event.offsetX * factor, event.offsetY * factor);
     }.bind(touch_mover);
     touch_mover.on_move = function (canvas, event, point) {
-        var factor=canvas.dp;
-        point=new notebook.utils.Point(event.offsetX*factor,event.offsetY*factor);
+        var factor = canvas.dp;
+        point = new notebook.utils.Point(event.offsetX * factor, event.offsetY * factor);
         var dx = point.x - this.lastpos.x, dy = point.y - this.lastpos.y;
         canvas.move(-dx, -dy);
         this.lastpos = point;
@@ -179,7 +194,7 @@
 
     image_creator.on_end = function (canvas, event, point) {
         var value = `![image](${notebook.Env.image_creator.url})`;
-        var md = new notebook.MarkdownArea(point, notebook.Config.default_markdown_width, notebook.Config.default_markdown_height,value);
+        var md = new notebook.MarkdownArea(point, notebook.Config.default_markdown_width, notebook.Config.default_markdown_height, value);
         canvas.add_object(md);
         notebook.Env.image_creator.url = '';
     }.bind(image_creator)
