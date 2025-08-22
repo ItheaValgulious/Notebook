@@ -12,4 +12,6 @@ window.onload = () => {
     
     notebook.canvas = new notebook.Canvas();
     notebook.canvas.init();
+
+    document.documentElement.requestFullscreen();
 }
