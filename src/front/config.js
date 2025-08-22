@@ -1,5 +1,4 @@
 (function () {
-    window.notebook = {};
     window.notebook.Config = {
         min_point_distance: 3,
         tension: 0.5,
@@ -16,14 +15,7 @@
         default_markdown_width: 500,
         default_markdown_height: 500,
         select_color: 'rgba(98, 145, 255, 0.79)',
-        empty_file_template: { objects: [], styles: {}, pos: { x: 0, y: 0 } },
-
-        picbed: {
-            enable: false,
-            token: '',
-            user: '',
-            repo: ''
-        }
+        empty_file_canvas_template: { objects: [], styles: {}, pos: { x: 0, y: 0 } },
     };
     window.notebook.Env = {
         current_pen: {
@@ -39,11 +31,4 @@
             url:''
         }
     };
-    window.api.read_file('settings.json').then((data) => {
-        var settings = JSON.parse(data);
-        for (var key in settings) {
-            window.notebook.Config[key] = settings[key];
-        }
-    })
-
 })();

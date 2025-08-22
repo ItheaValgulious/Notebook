@@ -51,7 +51,7 @@
 
 
         vditor_inited() {
-            this.vditor.updateToolbarConfig({ hide: true });
+            // this.vditor.updateToolbarConfig({ hide: true });
             // this.vditor.focus();
         }
 

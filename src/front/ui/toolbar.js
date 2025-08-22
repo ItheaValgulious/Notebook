@@ -35,10 +35,17 @@
         new UIButton('lasso', 'lasso', () => { notebook.Env.current_pen['pen'] = 'selector'; }),
 
         new UIButton('image', 'image', async () => {
-            const file = await window.api.showOpenDialog();
+            var file=await notebook.picbed.upload_file();
             if (file) {
-                const blob = await window.api.read_blob(file);
-                const url = (await notebook.picbed.upload(blob)).url;
+                const url = (await notebook.picbed.upload(file)).url;
+                notebook.Env.current_pen['pen'] = 'image_creator';
+                notebook.Env.image_creator.url = url;
+            }
+        }),
+        new UIButton('camera', 'camera', async () => {
+            var file=await notebook.picbed.take_photo();
+            if (file) {
+                const url = (await notebook.picbed.upload(file)).url;
                 notebook.Env.current_pen['pen'] = 'image_creator';
                 notebook.Env.image_creator.url = url;
             }
@@ -162,19 +169,6 @@
         updateSliderLabel('eraser-size', 'eraser-size-label', 'Width', document.getElementById('eraser-size').value);
 
 
-        // File Dropdown
-        const fileBtn = document.getElementById('file-btn');
-        const fileDropdown = document.getElementById('file-dropdown');
-        fileBtn.addEventListener('click', () => {
-            fileDropdown.classList.toggle('show');
-            const rect = fileBtn.getBoundingClientRect();
-            fileDropdown.style.top = `${rect.top}px`;
-        });
-        fileDropdown.addEventListener('click', (e) => {
-            fileDropdown.classList.toggle('show');
-        });
-
-
         // Tree Panel
         const treeBtn = document.getElementById('tree-btn');
         const treePanelDom = document.getElementById('tree-panel');
@@ -193,6 +187,7 @@
             document.getElementById('eraser-btn'),
             document.getElementById('lasso-btn'),
             document.getElementById('image-btn'),
+            document.getElementById('camera-btn'),
             document.getElementById('markdown-btn'),
             document.getElementById('setting-btn'),
             document.getElementById('mode-btn')
@@ -339,6 +334,25 @@
             imageUIButton.on_choose(null);
         });
 
+        // Camera
+        const cameraBtn = document.getElementById('camera-btn');
+        const cameraUIButton = uiButtons.find(btn => btn.id === 'camera');
+        cameraBtn.addEventListener('click', () => {
+            toolButtons.forEach(b => {
+                b.classList.remove('active');
+                if (b.classList.contains('brush')) {
+                    document.getElementById(`brush-config-${b.dataset.brush}`).classList.remove('show');
+                } else if (b.id === 'eraser-btn') {
+                    document.getElementById('eraser-config').classList.remove('show');
+                } else if (b.id === 'mode-btn') {
+                    document.getElementById('mode-dropdown').classList.remove('show');
+                }
+            });
+            cameraBtn.classList.add('active');
+            selectedTool = cameraBtn;
+            cameraUIButton.on_choose(null);
+        });
+
         // Insert Markdown
         const markdownBtn = document.getElementById('markdown-btn');
         const markdownUIButton = uiButtons.find(btn => btn.id === 'markdown');
@@ -400,9 +414,6 @@
 
         // Close dropdowns and panels when clicking outside
         document.addEventListener('click', (e) => {
-            if (!fileBtn.contains(e.target) && !fileDropdown.contains(e.target)) {
-                fileDropdown.classList.remove('show');
-            }
             if (!modeBtn.contains(e.target) && !modeDropdown.contains(e.target)) {
                 modeDropdown.classList.remove('show');
             }
@@ -513,20 +524,4 @@
     }
 
     notebook.init_toolbar = init_toolbar;
-    notebook.toolbar.events = {
-        open_file: async () => {
-            if (notebook.canvas.objects.length) await notebook.file.save_file();
-            await notebook.file.open_file();
-        },
-        new_file: async () => {
-            if (notebook.canvas.objects.length) await notebook.file.save_file();
-            await notebook.file.new_file();
-        },
-        save_file: notebook.file.save_file,
-        open_folder: async () => {
-            await notebook.file.open_folder();
-            document.getElementById('tree-panel').classList.add('show');
-        },
-        set_mode(mode) { }
-    }
 })();

@@ -39,7 +39,12 @@
 
         this.set_style();
 
+        this.canvas.oncontextmenu = function (event) {
+            event.preventDefault(); // 禁用默认右键菜单
+        };
+
         function pointer_begin(event) {
+            event.preventDefault();
             var pointerType = event.pointerType;
             if (pointerType == 'mouse' && event.button == 0) {
                 pointerType = 'touch';
@@ -54,6 +59,7 @@
             notebook.Env.current_pointer_type = pointerType;
         }
         function pointer_move(ev) {
+            ev.preventDefault();
             var pointerType = ev.pointerType;
             if (pointerType == 'mouse') pointerType = notebook.Env.current_pointer_type;
 
@@ -68,6 +74,7 @@
             }
         }
         function pointer_end(event) {
+            event.preventDefault();
             var pointerType = event.pointerType;
             if (pointerType == 'mouse') pointerType = notebook.Env.current_pointer_type;
             if (notebook.Env.current_pointer_type != pointerType) return;
@@ -124,6 +131,10 @@
         this.pos.x = data.pos.x;
         this.pos.y = data.pos.y;
         this.objects = [];
+        this.content_container.innerHTML = '';
+        notebook.stroke_styles.load(data.styles);
+        this.set_style();
+
         for (var o of data.objects) {
             if (o.type == 'stroke') {
                 var stroke = notebook.Stroke.load(o);
@@ -134,10 +145,7 @@
                 this.add_object(markdown);
             }
         }
-        notebook.stroke_styles.load(data.styles);
-        this.set_style();
         this.add_dirty_rect(notebook.utils.Rect.full().move(this.pos.x, this.pos.y));
-        this.content_container.innerHTML = '';
     }
     Canvas.prototype.move = function (dx, dy) {
         this.pos.x += dx;

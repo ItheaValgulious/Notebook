@@ -13,8 +13,11 @@
 
         <link rel="stylesheet" href="ui/toolbar.css" />
         <link rel="stylesheet" href="ui/index.css" />
+        <link rel="stylesheet" href="ui/camera.css" />
+
 
         <script src="../lib/vditor.js"></script>
+        <script src="ui/api.js"></script>
 
         <script src="config.js"></script>
 
@@ -30,6 +33,8 @@
         <script src="canvas/pen.js"></script>
 
         <script src="ui/info.js"></script>
+        <script src="ui/setting.js"></script>
+
         <script src="ui/file.js"></script>
         <script src="ui/rightmenu.js"></script>
         <script src="ui/picbed.js"></script>
@@ -42,26 +47,6 @@
 
     <body>
         <div class="toolbar">
-            <button id="file-btn" title="File">
-                <i class="fas fa-file"></i></button>
-            <div class="dropdown" id="file-dropdown">
-                <div onclick="notebook.toolbar.events.new_file()">
-                    <i class="fas fa-file"></i>
-                    New
-                </div>
-                <div onclick="notebook.toolbar.events.open_file()">
-                    <i class="fas fa-folder-open"></i>
-                    Open
-                </div>
-                <div onclick="notebook.toolbar.events.save_file()">
-                    <i class="fas fa-save"></i>
-                    Save
-                </div>
-                <div onclick="notebook.toolbar.events.open_folder()">
-                    <i class="fas fa-folder"></i>
-                    Open Folder
-                </div>
-            </div>
             <button id="tree-btn" title="Tree">
                 <i class="fas fa-sitemap"></i></button>
             <div class="tree-panel" id="tree-panel">
@@ -172,6 +157,9 @@
             </button>
             <div class="divider"></div>
             <button id="image-btn" data-brush="image" title="Insert Image">
+                <i class="fas fa-image"></i>
+            </button>
+            <button id="camera-btn" data-brush="camera" title="Insert Image From Camera">
                 <i class="fas fa-image"></i>
             </button>
             <button id="markdown-btn" data-brush="markdown" title="Insert Markdown">

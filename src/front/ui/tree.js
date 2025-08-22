@@ -108,6 +108,7 @@
         }
         init() {
             this.treePanel.init(document.getElementById('tree-content'));
+            this.set_path('/')
         }
         async set_path(path) {
             this.path = path;
@@ -130,6 +131,7 @@
 
 
             var _rename = (e) => {
+                this.clear_select();
                 window.api.rename(path, label.innerText);
                 this.set_path(this.path);
             }
@@ -148,10 +150,20 @@
             label.addEventListener('blur', _rename);
             label.addEventListener('keydown', func);
         }
+        clear_select() {
+            notebook.Env.current_file = null;
+            this.treePanel.dom.querySelectorAll('.useless_selected').forEach(item => {
+                item.classList.remove('useless_selected');
+            });
+            this.treePanel.dom.querySelectorAll('.selected').forEach(item => {
+                item.classList.remove('selected');
+            });
+        }
         create_render_obj(obj) {
+            var name = obj.path.split('/').pop();
             return {
-                label: obj.name,
-                icon: obj.type === 'directory' ? 'folder' : (obj.name.split('.').pop() == 'fire' ? 'fire' : 'file'),
+                label: name,
+                icon: obj.type === 'folder' ? 'folder' : (name.split('.').pop() == 'fire' ? 'fire' : 'file'),
 
                 children: obj.children ? obj.children.map(child => this.construct_render_tree_obj(child)) : [],
                 data: {
@@ -159,25 +171,20 @@
                     path: obj.path
                 },
                 on_left_click: async (obj, nodeDiv, e) => {
-                    if (obj.data.type == 'directory') return;
-                    if (obj.data.path == notebook.Config.current_file) return;
-                    this.treePanel.dom.querySelectorAll('.useless_selected').forEach(item => {
-                        item.classList.remove('useless_selected');
-                    });
-                    this.treePanel.dom.querySelectorAll('.selected').forEach(item => {
-                        item.classList.remove('selected');
-                    });
+                    if (obj.data.type == 'folder') return;
+                    if (obj.data.path == notebook.Env.current_file) return;
+                    if (notebook.canvas.objects.length) notebook.file.save_file();
+                    this.clear_select();
                     if (obj.label.split('.').pop() != 'fire') {
                         nodeDiv.classList.add('useless_selected');
                         return;
                     }
-                    if (notebook.canvas.objects.length) notebook.file.save_file();
                     nodeDiv.classList.add('selected');
-
-                    notebook.file.open(obj.data.path);
+                    await notebook.file.open(obj.data.path);
+                    notebook.toolbar.manager.select_brush(0);
                 },
                 on_right_click: (obj, nodeDiv, e) => {
-                    if (obj.data.type == 'directory') {
+                    if (obj.data.type == 'folder') {
                         notebook.create_right_menu([
                             {
                                 text: 'New File', action: async () => {
@@ -192,7 +199,10 @@
 
                                     var filename = `note_${year}_${month}_${day}_${hours}_${minutes}_${seconds}.fire`;
 
-                                    await window.api.save_file(obj.data.path + '/' + filename, JSON.stringify(notebook.Config.empty_file_template));
+                                    await window.api.save_file(obj.data.path + '/' + filename, JSON.stringify({
+                                        canvas: notebook.Config.empty_file_canvas_template,
+                                        toolbar: notebook.toolbar.manager.save()
+                                    }));
                                     this.set_path(this.path);
 
                                 }, type: 'item'
@@ -217,6 +227,15 @@
                                     // 刷新树显示
                                     this.set_path(this.path);
                                 }, type: 'item'
+                            },
+                            { type: 'seperate' },
+                            {
+                                text: "Open Folder",
+                                action: async () => {
+                                    this.path = obj.data.path;
+                                    this.tree.set_path(this.path);
+                                }
+
                             }
                         ], e);
                     } else {
