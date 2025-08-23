@@ -128,6 +128,11 @@
         this.canvas.addEventListener('touchstart', touch_handler.handleTouchStart);
         this.canvas.addEventListener('touchmove', touch_handler.handleTouchMove);
 
+        this.canvas.addEventListener('wheel', function (event) {
+            event.preventDefault();
+            var delta = Math.sign(event.deltaY);
+            this.set_scale(this.scale * (1 + delta * 0.1));
+        }.bind(this));
 
         this.render();
     }

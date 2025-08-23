@@ -82,6 +82,12 @@
 
     //init all
     function _init_toolbar() {
+        window.addEventListener('keydown',(e)=>{
+            if(e.key=='s'&&e.ctrlKey){
+                e.preventDefault();
+                notebook.file.save_file();
+            }
+        });
 
         // Create a single off-screen canvas for color wheel
         const offscreenCanvas = document.createElement('canvas');
@@ -410,6 +416,12 @@
             const rect = modeBtn.getBoundingClientRect();
             modeDropdown.style.top = `${rect.top}px`;
             modeUIButton.on_choose(null);
+        });
+
+        // Save Button
+        const saveBtn = document.getElementById('save-btn');
+        saveBtn.addEventListener('click', () => {
+            notebook.file.save_file();
         });
 
         // Close dropdowns and panels when clicking outside
