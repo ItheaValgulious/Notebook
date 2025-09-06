@@ -35,20 +35,9 @@
         new UIButton('lasso', 'lasso', () => { notebook.Env.current_pen['pen'] = 'selector'; }),
 
         new UIButton('image', 'image', async () => {
-            var file=await notebook.picbed.upload_file();
-            if (file) {
-                const url = (await notebook.picbed.upload(file)).url;
-                notebook.Env.current_pen['pen'] = 'image_creator';
-                notebook.Env.image_creator.url = url;
-            }
-        }),
-        new UIButton('camera', 'camera', async () => {
-            var file=await notebook.picbed.take_photo();
-            if (file) {
-                const url = (await notebook.picbed.upload(file)).url;
-                notebook.Env.current_pen['pen'] = 'image_creator';
-                notebook.Env.image_creator.url = url;
-            }
+            const url=(await notebook.file.upload_picture());
+            notebook.Env.current_pen['pen'] = 'image_creator';
+            notebook.Env.image_creator.url = url;
         }),
         new UIButton('markdown', 'markdown', () => { notebook.Env.current_pen['pen'] = 'markdown_creator'; }),
 
@@ -193,7 +182,6 @@
             document.getElementById('eraser-btn'),
             document.getElementById('lasso-btn'),
             document.getElementById('image-btn'),
-            document.getElementById('camera-btn'),
             document.getElementById('markdown-btn'),
             document.getElementById('setting-btn'),
             document.getElementById('mode-btn')
@@ -340,24 +328,6 @@
             imageUIButton.on_choose(null);
         });
 
-        // Camera
-        const cameraBtn = document.getElementById('camera-btn');
-        const cameraUIButton = uiButtons.find(btn => btn.id === 'camera');
-        cameraBtn.addEventListener('click', () => {
-            toolButtons.forEach(b => {
-                b.classList.remove('active');
-                if (b.classList.contains('brush')) {
-                    document.getElementById(`brush-config-${b.dataset.brush}`).classList.remove('show');
-                } else if (b.id === 'eraser-btn') {
-                    document.getElementById('eraser-config').classList.remove('show');
-                } else if (b.id === 'mode-btn') {
-                    document.getElementById('mode-dropdown').classList.remove('show');
-                }
-            });
-            cameraBtn.classList.add('active');
-            selectedTool = cameraBtn;
-            cameraUIButton.on_choose(null);
-        });
 
         // Insert Markdown
         const markdownBtn = document.getElementById('markdown-btn');

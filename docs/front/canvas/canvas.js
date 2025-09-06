@@ -131,7 +131,7 @@
         this.canvas.addEventListener('wheel', function (event) {
             event.preventDefault();
             var delta = Math.sign(event.deltaY);
-            this.set_scale(this.scale * (1 + delta * 0.1));
+            this.set_scale((1 + delta * 0.1));
         }.bind(this));
 
         this.render();
@@ -221,6 +221,7 @@
         if (this.scale < notebook.Config.min_scale) this.scale = notebook.Config.min_scale;
         if (this.scale > notebook.Config.max_scale) this.scale = notebook.Config.max_scale;
         this.set_style();
+        this.add_dirty_rect(notebook.utils.Rect.full());
     }
 
     window.notebook.Canvas = Canvas;
