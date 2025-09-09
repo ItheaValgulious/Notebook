@@ -30,13 +30,13 @@
                 value:value
             };
             this.vditor = new Vditor(this.dom, config);
-            this.set_style();
+            this.update();
 
             //vditor will be able to use after some time(why?)
             var waiter = new notebook.utils.Waiter(() => { return this.vditor.vditor != undefined }, () => { this.vditor_inited(); });
         }
 
-        set_style() {
+        update() {
             this.rect.set(this.pos.x, this.pos.y, this.pos.x + this.width, this.pos.y + this.height);
 
             this.dom.style.left = this.pos.x / notebook.Config.canvas_dp + 'px';
@@ -69,7 +69,6 @@
                 width: this.width,
                 height: this.height,
                 type: 'markdown'
-
             }
         }
 
@@ -82,33 +81,16 @@
 
         draw(ctx) { }
 
-        collide_path(ctx) {
-            return (ctx.isPointInPath(this.rect.x1, this.rect.y1) && ctx.isPointInPath(this.rect.x2, this.rect.y2) && ctx.isPointInPath(this.rect.x1, this.rect.y2) && ctx.isPointInPath(this.rect.x2, this.rect.y1))
-        }
-
+        
         set_selected(selected) {
-            this.selected = selected;
-            if (selected) this.canvas.selected.push(this);
-            else {
-                const index = this.canvas.selected.indexOf(this);
-                if (index > -1) this.canvas.selected.splice(index, 1);
-            }
+            super.set_selected(selected);
             if (selected) this.dom.classList.add('selected');
             else this.dom.classList.remove('selected');
-
         }
 
         move(dx, dy) {
             super.move(dx, dy);
-            this.set_style();
-        }
-
-        collide_circle(x, y, r) {
-            return !(x < this.rect.x1 || x > this.rect.x2 || y < this.rect.y1 || y > this.rect.y2) ||
-                notebook.utils.distance_to_line(x, y, this.rect.x1, this.rect.y1, this.rect.x1, this.rect.y2) <= r ||
-                notebook.utils.distance_to_line(x, y, this.rect.x1, this.rect.y1, this.rect.x2, this.rect.y1) <= r ||
-                notebook.utils.distance_to_line(x, y, this.rect.x2, this.rect.y1, this.rect.x2, this.rect.y2) <= r ||
-                notebook.utils.distance_to_line(x, y, this.rect.x2, this.rect.y2, this.rect.x1, this.rect.y2) <= r;
+            this.update();
         }
         start_edit() {
             this.canvas.content_container.style.zIndex = 1;

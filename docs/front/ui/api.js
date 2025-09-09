@@ -4,7 +4,7 @@
          * Local FastAPI Notebook Server
          * @param {string} baseUrl - Base URL of the FastAPI server (default: http://127.0.0.1:8000)
          */
-        constructor(baseUrl = 'http://127.0.0.1:8000') {
+        constructor(baseUrl = 'http://192.168.137.1:8000') {
             this.baseUrl = baseUrl;
             this.token = null;
         }

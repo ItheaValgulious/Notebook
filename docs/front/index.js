@@ -12,4 +12,8 @@ window.onload = async () => {
     
     notebook.canvas = new notebook.Canvas();
     notebook.canvas.init();
+
+    setInterval(() => {
+        notebook.file.save_file();
+    }, 60000);
 }

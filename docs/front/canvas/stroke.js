@@ -14,22 +14,15 @@
         }
 
         set_selected(selected) {
-            if (this.selected === selected) return;
-
-            this.selected = selected;
-            this.canvas.add_dirty_rect(this.rect);
-            if (selected) this.canvas.selected.push(this)
-            else {
-                const index = this.canvas.selected.indexOf(this);
-                if (index > -1) this.canvas.selected.splice(index, 1);
-            }
+            if (super.set_selected(selected))
+                this.canvas.add_dirty_rect(this.rect);
         }
 
         _draw(ctx, dirty_rect, styleid) {
-            dirty_rect.x1-=notebook.Config.dirty_bias;
-            dirty_rect.x2+=notebook.Config.dirty_bias;
-            dirty_rect.y1-=notebook.Config.dirty_bias;
-            dirty_rect.y2+=notebook.Config.dirty_bias;
+            dirty_rect.x1 -= notebook.Config.dirty_bias;
+            dirty_rect.x2 += notebook.Config.dirty_bias;
+            dirty_rect.y1 -= notebook.Config.dirty_bias;
+            dirty_rect.y2 += notebook.Config.dirty_bias;
 
             styleid = styleid || this.styleid;
 
@@ -81,11 +74,11 @@
                 }
             }
         }
-        draw(ctx,dirty_rect) {
-            if(this.selected){
-                this._draw(ctx,dirty_rect,notebook.stroke_styles.get_selected_style(this.styleid));
+        draw(ctx, dirty_rect) {
+            if (this.selected) {
+                this._draw(ctx, dirty_rect, notebook.stroke_styles.get_selected_style(this.styleid));
             }
-            this._draw(ctx,dirty_rect);
+            this._draw(ctx, dirty_rect);
         }
 
 
@@ -157,7 +150,7 @@
         static load(data) {
             var stroke = new Stroke(data.styleid);
             stroke.pos = new notebook.utils.Point(data.pos.x, data.pos.y);
-            for(var p of data.points)
+            for (var p of data.points)
                 stroke.points.push(new notebook.StrokePoint(new notebook.utils.Point(p.x, p.y), p.pressure));
             stroke.calc_rect();
             return stroke;

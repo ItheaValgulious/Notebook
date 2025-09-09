@@ -44,10 +44,10 @@
             }
         }
         if (delete_all_selected) {
-            var list=[];
-            for (var se of canvas.selected) 
+            var list = [];
+            for (var se of canvas.selected)
                 list.push(se);
-            for(var obj of list){
+            for (var obj of list) {
                 obj.set_selected(false);
                 canvas.remove_object(obj);
             }
@@ -161,12 +161,12 @@
         if (this.mode == 'create') {
             this.markdown.width = point.x - this.beginpos.x;
             this.markdown.height = point.y - this.beginpos.y;
-            this.markdown.set_style()
+            this.markdown.update()
         } else if (this.mode == 'edit') {
             var dx = point.x - this.lastpos.x, dy = point.y - this.lastpos.y;
             this.markdown.width += dx;
             this.markdown.height += dy;
-            this.markdown.set_style();
+            this.markdown.update();
         }
         this.sum.x += Math.abs(point.x - this.lastpos.x);
         this.sum.y += Math.abs(point.y - this.lastpos.y);
@@ -177,14 +177,14 @@
             if (this.sum.x <= notebook.Config.click_max_distance && this.sum.y <= notebook.Config.click_max_distance) {
                 this.markdown.width = notebook.Config.default_markdown_width;
                 this.markdown.height = notebook.Config.default_markdown_height;
-                this.markdown.set_style();
+                this.markdown.update();
             }
             this.markdown.focus();
         } else if (this.mode == 'edit') {
             if (this.sum.x <= notebook.Config.click_max_distance && this.sum.y <= notebook.Config.click_max_distance) {
                 this.markdown.width -= point.x - this.beginpos.x;
                 this.markdown.height -= point.y - this.beginpos.y;
-                this.markdown.set_style();
+                this.markdown.update();
                 this.markdown.focus()
             } else {
             }
@@ -192,12 +192,53 @@
         this.markdown = null;
     }.bind(markdown_creator);
 
+    image_creator.on_begin = function (canvas, event, point) {
+        this.mode = 'create';
+        this.beginpos = point;
+        this.lastpos = point;
+        this.sum = notebook.utils.Point.zero();
+        for (var obj of canvas.objects) {
+            if (obj instanceof notebook.PictureObj && obj.rect.in(point)) {
+                this.mode = 'edit';
+                this.picture = obj;
+            }
+        }
+        if (this.mode == 'create') {
+            this.picture = new notebook.PictureObj(notebook.Env.image_creator.url, point);
+            canvas.add_object(this.picture);
+        }
+
+    }.bind(image_creator);
+    image_creator.on_move = function (canvas, event, point) {
+        if (this.mode == 'create') {
+            this.picture.update();
+            this.picture.width = point.x - this.beginpos.x;
+            this.picture.height = point.y - this.beginpos.y;
+            this.picture.update();
+        } else if (this.mode == 'edit') {
+            var dx = point.x - this.lastpos.x, dy = point.y - this.lastpos.y;
+            this.picture.update();
+            this.picture.width += dx;
+            this.picture.height += dy;
+            this.picture.update();
+        }
+        this.sum.x += Math.abs(point.x - this.lastpos.x);
+        this.sum.y += Math.abs(point.y - this.lastpos.y);
+        this.lastpos = point;
+    }.bind(image_creator);
     image_creator.on_end = function (canvas, event, point) {
-        var value = `![image](${notebook.Env.image_creator.url})`;
-        var md = new notebook.MarkdownArea(point, notebook.Config.default_markdown_width, notebook.Config.default_markdown_height, value);
-        canvas.add_object(md);
-        notebook.Env.image_creator.url = '';
-    }.bind(image_creator)
+        if (this.mode == 'create') {
+            this.picture.update();
+        } else if (this.mode == 'edit') {
+            if (this.sum.x <= notebook.Config.click_max_distance && this.sum.y <= notebook.Config.click_max_distance) {
+                this.picture.width -= point.x - this.beginpos.x;
+                this.picture.height -= point.y - this.beginpos.y;
+                this.picture.update();
+            } else {
+            }
+        }
+        this.picture = null;
+    }.bind(image_creator);
 
 
 

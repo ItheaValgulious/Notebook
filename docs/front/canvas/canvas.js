@@ -11,15 +11,18 @@
         this.selected = [];
         this.pos = notebook.utils.Point.zero();
         this.scale = 1;
-        this.dirty_rect = notebook.utils.Rect.full().scale(1 / this.scale).move(this.pos.x / this.scale, this.pos.y / this.scale);
+        this.dirty_rect = this.screen_rect();
+    }
+    Canvas.prototype.screen_rect = function () {
+        return notebook.utils.Rect.full().scale(1 / this.scale).move(this.pos.x / this.scale, this.pos.y / this.scale);
     }
     Canvas.prototype.add_object = function (object) {
         this.objects.push(object);
         object.canvas = this;
         object.on_add_to_canvas();
     }
-    Canvas.prototype.get_true_position = function (event) {
-        return new notebook.utils.Point((event.offsetX * this.dp + this.pos.x) / this.scale, (event.offsetY * this.dp + this.pos.y) / this.scale);
+    Canvas.prototype.get_true_position = function (x, y) {
+        return new notebook.utils.Point((x * this.dp + this.pos.x) / this.scale, (y * this.dp + this.pos.y) / this.scale);
     }
     Canvas.prototype.init = function (parentNode) {
 
@@ -57,7 +60,7 @@
             this.canvas.addEventListener('pointermove', pointer_move);
             this.canvas.addEventListener('pointerup', pointer_end);
 
-            notebook.pens[notebook.Env.current_pen[pointerType]].on_begin(this, event, this.get_true_position(event));
+            notebook.pens[notebook.Env.current_pen[pointerType]].on_begin(this, event, this.get_true_position(event.offsetX, event.offsetY));
             notebook.Env.current_pointer_type = pointerType;
         }
         function pointer_move(ev) {
@@ -72,7 +75,7 @@
                 events = ev.getCoalescedEvents();
             else events = [ev];
             for (var event of events) {
-                notebook.pens[notebook.Env.current_pen[pointerType]].on_move(this, event, this.get_true_position(event));
+                notebook.pens[notebook.Env.current_pen[pointerType]].on_move(this, event, this.get_true_position(event.offsetX, event.offsetY));
             }
         }
         function pointer_end(event) {
@@ -83,7 +86,7 @@
 
             this.canvas.removeEventListener('pointerup', pointer_end);
             this.canvas.removeEventListener('pointermove', pointer_move);
-            notebook.pens[notebook.Env.current_pen[pointerType]].on_end(this, event, this.get_true_position(event));
+            notebook.pens[notebook.Env.current_pen[pointerType]].on_end(this, event, this.get_true_position(event.offsetX, event.offsetY));
             notebook.Env.current_pointer_type = null;
         }
 
@@ -130,13 +133,14 @@
 
         this.canvas.addEventListener('wheel', function (event) {
             event.preventDefault();
-            var delta = Math.sign(event.deltaY);
+            var delta = -Math.sign(event.deltaY);
             this.set_scale((1 + delta * 0.1));
         }.bind(this));
 
         this.render();
     }
     Canvas.prototype.render = function () {
+
         requestAnimationFrame(this.render.bind(this));
         if (this.dirty_rect.is_empty()) return;
         this.ctx.save();
@@ -191,15 +195,18 @@
             else if (o.type == 'markdown') {
                 var markdown = notebook.MarkdownArea.load(o);
                 this.add_object(markdown);
+            }else if (o.type == 'picture'){
+                var picture=notebook.PictureObj.load(o);
+                this.add_object(picture);
             }
         }
-        this.add_dirty_rect(notebook.utils.Rect.full().scale(1 / this.scale).move(this.pos.x / this.scale, this.pos.y / this.scale));
+        this.add_dirty_rect(this.screen_rect());
 
     }
     Canvas.prototype.move = function (dx, dy) {
         this.pos.x += dx;
         this.pos.y += dy;
-        this.add_dirty_rect(notebook.utils.Rect.full().scale(1 / this.scale).move(this.pos.x / this.scale, this.pos.y / this.scale));
+        this.add_dirty_rect(this.screen_rect());
         this.set_style();
     }
     Canvas.prototype.set_style = function () {
@@ -217,11 +224,20 @@
         }
     }
     Canvas.prototype.set_scale = function (scaleFactor) {
+        var old_scale = this.scale;
         this.scale *= scaleFactor;
         if (this.scale < notebook.Config.min_scale) this.scale = notebook.Config.min_scale;
         if (this.scale > notebook.Config.max_scale) this.scale = notebook.Config.max_scale;
+        var new_scale = this.scale;
+
+        var center=this.get_true_position(this.width/2,this.height/2);
+
+        this.move((center.x * new_scale - center.x * old_scale),
+            (center.y * new_scale - center.y * old_scale));
+
+
         this.set_style();
-        this.add_dirty_rect(notebook.utils.Rect.full());
+        this.add_dirty_rect(this.screen_rect());
     }
 
     window.notebook.Canvas = Canvas;

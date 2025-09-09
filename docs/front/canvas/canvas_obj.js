@@ -15,16 +15,27 @@
             this.rect.move(dx, dy);
         }
         collide_circle(x, y, r) {
-            virtual_func_error();
+            return !(x < this.rect.x1 || x > this.rect.x2 || y < this.rect.y1 || y > this.rect.y2) ||
+                notebook.utils.distance_to_line(x, y, this.rect.x1, this.rect.y1, this.rect.x1, this.rect.y2) <= r ||
+                notebook.utils.distance_to_line(x, y, this.rect.x1, this.rect.y1, this.rect.x2, this.rect.y1) <= r ||
+                notebook.utils.distance_to_line(x, y, this.rect.x2, this.rect.y1, this.rect.x2, this.rect.y2) <= r ||
+                notebook.utils.distance_to_line(x, y, this.rect.x2, this.rect.y2, this.rect.x1, this.rect.y2) <= r;
         }
         fast_collide_rect(rect) {
             return this.rect.collide_rect(rect);
         }
         collide_path(ctx) {
-            virtual_func_error();
+            return (ctx.isPointInPath(this.rect.x1, this.rect.y1) && ctx.isPointInPath(this.rect.x2, this.rect.y2) && ctx.isPointInPath(this.rect.x1, this.rect.y2) && ctx.isPointInPath(this.rect.x2, this.rect.y1))
         }
         set_selected(selected) {
-            virtual_func_error();
+            if (this.selected === selected) return false;
+            this.selected = selected;
+            if (selected) this.canvas.selected.push(this);
+            else {
+                const index = this.canvas.selected.indexOf(this);
+                if (index > -1) this.canvas.selected.splice(index, 1);
+            }
+            return true;
         }
         draw(ctx) {
             virtual_func_error();
