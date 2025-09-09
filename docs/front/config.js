@@ -31,8 +31,7 @@
         current_file: null,
         image_creator:{
             url:''
-        },
-        last_tool: null
+        }
     };
     window.notebook.Tips={
         'dye':'Dye is to change the style of selected object to the last brush you use!'

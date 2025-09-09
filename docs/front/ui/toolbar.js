@@ -70,41 +70,7 @@
 
     let selectedTool = null;
 
-    // Helper function to store current tool as last_tool
-    function storeCurrentToolAsLast() {
-        if (selectedTool) {
-            if (selectedTool.classList.contains('brush')) {
-                notebook.Env.last_tool = {
-                    'type': 'brush',
-                    'index': selectedTool.dataset.brush - 1
-                };
-            } else if (selectedTool.id === 'eraser-btn') {
-                notebook.Env.last_tool = {
-                    'type': 'eraser',
-                };
-            } else if (selectedTool.id === 'lasso-btn') {
-                notebook.Env.last_tool = {
-                    'type': 'lasso',
-                };
-            } else if (selectedTool.id === 'image-btn') {
-                notebook.Env.last_tool = {
-                    'type': 'image',
-                };
-            } else if (selectedTool.id === 'markdown-btn') {
-                notebook.Env.last_tool = {
-                    'type': 'markdown',
-                };
-            } else if (selectedTool.id === 'setting-btn') {
-                notebook.Env.last_tool = {
-                    'type': 'setting',
-                };
-            } else if (selectedTool.id === 'mode-btn') {
-                notebook.Env.last_tool = {
-                    'type': 'mode',
-                };
-            }
-        }
-    }
+
 
     //init all
     function _init_toolbar() {
@@ -241,7 +207,6 @@
                 configPanel.classList.toggle('show');
                 configPanel.style.top = `${rect.top}px`;
             } else {
-                storeCurrentToolAsLast();
                 toolButtons.forEach(b => {
                     b.classList.remove('active');
                     if (b.classList.contains('brush')) {
@@ -305,8 +270,7 @@
                 eraserConfig.classList.toggle('show');
                 eraserConfig.style.top = `${rect.top}px`;
             } else {
-        storeCurrentToolAsLast();
-        toolButtons.forEach(b => {
+                toolButtons.forEach(b => {
                     b.classList.remove('active');
                     if (b.classList.contains('brush')) {
                         document.getElementById(`brush-config-${b.dataset.brush}`).classList.remove('show');
@@ -333,15 +297,14 @@
         const lassoBtn = document.getElementById('lasso-btn');
         const lassoUIButton = uiButtons.find(btn => btn.id === 'lasso');
         lassoBtn.addEventListener('click', () => {
-    storeCurrentToolAsLast();
-    toolButtons.forEach(b => {
-                b.classList.remove('active');
-                if (b.classList.contains('brush')) {
-                    document.getElementById(`brush-config-${b.dataset.brush}`).classList.remove('show');
-                } else if (b.id === 'eraser-btn') {
-                    document.getElementById('eraser-config').classList.remove('show');
-                } else if (b.id === 'mode-btn') {
-                    document.getElementById('mode-dropdown').classList.remove('show');
+            toolButtons.forEach(b => {
+                if (!b.classList.contains('brush')) {
+                    b.classList.remove('active');
+                    if (b.id === 'eraser-btn') {
+                        document.getElementById('eraser-config').classList.remove('show');
+                    } else if (b.id === 'mode-btn') {
+                        document.getElementById('mode-dropdown').classList.remove('show');
+                    }
                 }
             });
             lassoBtn.classList.add('active');
@@ -353,15 +316,14 @@
         const imageBtn = document.getElementById('image-btn');
         const imageUIButton = uiButtons.find(btn => btn.id === 'image');
         imageBtn.addEventListener('click', () => {
-            storeCurrentToolAsLast();
             toolButtons.forEach(b => {
-                b.classList.remove('active');
-                if (b.classList.contains('brush')) {
-                    document.getElementById(`brush-config-${b.dataset.brush}`).classList.remove('show');
-                } else if (b.id === 'eraser-btn') {
-                    document.getElementById('eraser-config').classList.remove('show');
-                } else if (b.id === 'mode-btn') {
-                    document.getElementById('mode-dropdown').classList.remove('show');
+                if (!b.classList.contains('brush')) {
+                    b.classList.remove('active');
+                    if (b.id === 'eraser-btn') {
+                        document.getElementById('eraser-config').classList.remove('show');
+                    } else if (b.id === 'mode-btn') {
+                        document.getElementById('mode-dropdown').classList.remove('show');
+                    }
                 }
             });
             imageBtn.classList.add('active');
@@ -374,15 +336,14 @@
         const markdownBtn = document.getElementById('markdown-btn');
         const markdownUIButton = uiButtons.find(btn => btn.id === 'markdown');
         markdownBtn.addEventListener('click', () => {
-            storeCurrentToolAsLast();
             toolButtons.forEach(b => {
-                b.classList.remove('active');
-                if (b.classList.contains('brush')) {
-                    document.getElementById(`brush-config-${b.dataset.brush}`).classList.remove('show');
-                } else if (b.id === 'eraser-btn') {
-                    document.getElementById('eraser-config').classList.remove('show');
-                } else if (b.id === 'mode-btn') {
-                    document.getElementById('mode-dropdown').classList.remove('show');
+                if (!b.classList.contains('brush')) {
+                    b.classList.remove('active');
+                    if (b.id === 'eraser-btn') {
+                        document.getElementById('eraser-config').classList.remove('show');
+                    } else if (b.id === 'mode-btn') {
+                        document.getElementById('mode-dropdown').classList.remove('show');
+                    }
                 }
             });
             markdownBtn.classList.add('active');
@@ -394,15 +355,14 @@
         const settingBtn = document.getElementById('setting-btn');
         const settingUIButton = uiButtons.find(btn => btn.id === 'setting');
         settingBtn.addEventListener('click', () => {
-            storeCurrentToolAsLast();
             toolButtons.forEach(b => {
-                b.classList.remove('active');
-                if (b.classList.contains('brush')) {
-                    document.getElementById(`brush-config-${b.dataset.brush}`).classList.remove('show');
-                } else if (b.id === 'eraser-btn') {
-                    document.getElementById('eraser-config').classList.remove('show');
-                } else if (b.id === 'mode-btn') {
-                    document.getElementById('mode-dropdown').classList.remove('show');
+                if (!b.classList.contains('brush')) {
+                    b.classList.remove('active');
+                    if (b.id === 'eraser-btn') {
+                        document.getElementById('eraser-config').classList.remove('show');
+                    } else if (b.id === 'mode-btn') {
+                        document.getElementById('mode-dropdown').classList.remove('show');
+                    }
                 }
             });
             settingBtn.classList.add('active');
@@ -415,13 +375,12 @@
         const modeDropdown = document.getElementById('mode-dropdown');
         const modeUIButton = uiButtons.find(btn => btn.id === 'mode');
         modeBtn.addEventListener('click', () => {
-            storeCurrentToolAsLast();
             toolButtons.forEach(b => {
-                b.classList.remove('active');
-                if (b.classList.contains('brush')) {
-                    document.getElementById(`brush-config-${b.dataset.brush}`).classList.remove('show');
-                } else if (b.id === 'eraser-btn') {
-                    document.getElementById('eraser-config').classList.remove('show');
+                if (!b.classList.contains('brush')) {
+                    b.classList.remove('active');
+                    if (b.id === 'eraser-btn') {
+                        document.getElementById('eraser-config').classList.remove('show');
+                    }
                 }
             });
             modeBtn.classList.add('active');
@@ -457,6 +416,15 @@
 
 
     notebook.toolbar.manager = {
+        get_brush(){
+            // Find the currently active brush (if any)
+            const activeBrush = document.querySelector('.brush.active');
+            if (activeBrush) {
+                return parseInt(activeBrush.dataset.brush) - 1;
+            }
+            // If no brush is active, return the first brush (default)
+            return 0;
+        },
         get_brush_style(id){
             const brush = document.querySelectorAll('.brush')[id];
             const color = brush.dataset.color;
@@ -470,7 +438,6 @@
         },
         select_brush(id) {
             selectedTool = null;
-            storeCurrentToolAsLast();
             document.querySelectorAll('.brush')[id].click();
         },
         save() {

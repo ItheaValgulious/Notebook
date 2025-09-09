@@ -143,12 +143,13 @@
                 {
                     text: 'Dye',
                     action: () => {
-                        if(notebook.Env.last_tool.type!='brush'){
+                        if(!notebook.toolbar.manager.get_brush()){
                             notebook.info(notebook.Tips.dye);
                             return;
                         }
-                        var config=notebook.toolbar.manager.get_brush_style(notebook.Env.last_tool.index);
-                        var id=notebook.stroke_styles.get_style(config['color'],config['width'],config['dash']);
+                        var brushId = notebook.toolbar.manager.get_brush();
+                        var config = notebook.toolbar.manager.get_brush_style(brushId);
+                        var id = notebook.stroke_styles.get_style(config['color'], config['width'], config['dash']);
                         for (var se of canvas.selected) {
                             if(se instanceof notebook.Stroke){
                                 se.styleid=id;
