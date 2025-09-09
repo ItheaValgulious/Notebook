@@ -138,6 +138,40 @@
                 }
             }
         }
+        if (canvas.selected.length)
+            notebook.create_right_menu([
+                {
+                    text: 'Dye',
+                    action: () => {
+                        if(notebook.Env.last_tool.type!='brush'){
+                            notebook.info(notebook.Tips.dye);
+                            return;
+                        }
+                        var config=notebook.toolbar.manager.get_brush_style(notebook.Env.last_tool.index);
+                        var id=notebook.stroke_styles.get_style(config['color'],config['width'],config['dash']);
+                        for (var se of canvas.selected) {
+                            if(se instanceof notebook.Stroke){
+                                se.styleid=id;
+                                se.update();
+                            }
+                        }
+                    },
+                    type: 'item'
+                },
+                {
+                    text: 'Delete',
+                    action: () => {
+                        var list = [];
+                        for (var se of canvas.selected)
+                            list.push(se);
+                        for (var obj of list) {
+                            obj.set_selected(false);
+                            canvas.remove_object(obj);
+                        }
+                    },
+                    type: 'item'
+                },
+            ], event.clientX, event.clientY);
     }
 
     markdown_creator.on_begin = function (canvas, event, point) {
@@ -173,6 +207,7 @@
         this.lastpos = point;
     }.bind(markdown_creator);
     markdown_creator.on_end = function (canvas, event, point) {
+        notebook.toolbar.manager.select_brush(0);
         if (this.mode == 'create') {
             if (this.sum.x <= notebook.Config.click_max_distance && this.sum.y <= notebook.Config.click_max_distance) {
                 this.markdown.width = notebook.Config.default_markdown_width;
@@ -227,6 +262,7 @@
         this.lastpos = point;
     }.bind(image_creator);
     image_creator.on_end = function (canvas, event, point) {
+        notebook.toolbar.manager.select_brush(0);
         if (this.mode == 'create') {
             this.picture.update();
         } else if (this.mode == 'edit') {

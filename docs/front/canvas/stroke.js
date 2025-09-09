@@ -10,12 +10,12 @@
         push(point) {
             this.points.push(point);
             this.rect.add(point.pos.x + this.pos.x, point.pos.y + this.pos.y);
-            this.canvas.add_dirty_rect(this.rect);
+            this.update();
         }
 
         set_selected(selected) {
             if (super.set_selected(selected))
-                this.canvas.add_dirty_rect(this.rect);
+                this.update();
         }
 
         _draw(ctx, dirty_rect, styleid) {
@@ -156,6 +156,10 @@
             return stroke;
         }
         on_remove_from_canvas() {
+            this.update();
+        }
+        update(){
+            this.calc_rect();
             this.canvas.add_dirty_rect(this.rect);
         }
 

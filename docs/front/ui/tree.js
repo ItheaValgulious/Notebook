@@ -237,7 +237,7 @@
                                 }
 
                             }
-                        ], e);
+                        ], e.clientX, e.clientY);
                     } else {
                         //file
                         notebook.create_right_menu([
@@ -252,7 +252,7 @@
                                     this.set_path(this.path);
                                 }, type: 'item'
                             },
-                        ], e);
+                        ], e.clientX, e.clientY);
                     }
                 },
                 on_double_click: (obj, nodeDiv, e) => {

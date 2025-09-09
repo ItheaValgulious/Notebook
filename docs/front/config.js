@@ -7,7 +7,7 @@
         canvas_height: 600,
         canvas_dp: 3,
         dirty_bias: 30,
-        debug: true,
+        debug: false,
         show_dirty_rect: true,
         selected_width: 2,
         click_max_distance: 20,
@@ -31,6 +31,10 @@
         current_file: null,
         image_creator:{
             url:''
-        }
+        },
+        last_tool: null
     };
+    window.notebook.Tips={
+        'dye':'Dye is to change the style of selected object to the last brush you use!'
+    }
 })();

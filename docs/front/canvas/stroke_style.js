@@ -63,6 +63,7 @@
         _get_style(color,dash,coefficients){
             var name = 'pen' + coefficients.join('.') + '_' + color + '_' + dash.join('.');
             if (!this.styles[name]) this.styles[name] = new StrokeStyle(color, dash, coefficients);
+            console.log(name);
             return name;
         }
         get_style(color, width, dash) {

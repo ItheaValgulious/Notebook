@@ -4,7 +4,7 @@
  * @param {Array} config - 菜单配置数组，每个元素包含 text, action, type 属性
  * @param {Object} event - 鼠标事件对象，用于获取坐标
  */
-    function create_right_menu(config, event) {
+    function create_right_menu(config, x, y) {
         // 移除已存在的菜单
         const existingMenu = document.getElementById('right-menu');
         if (existingMenu) {
@@ -64,10 +64,6 @@
             }
         });
 
-        // 获取鼠标坐标
-        const mouseX = event.clientX;
-        const mouseY = event.clientY;
-
         // 获取窗口尺寸
         const windowWidth = window.innerWidth;
         const windowHeight = window.innerHeight;
@@ -79,17 +75,17 @@
         const menuHeight = menuRect.height;
 
         // 计算菜单位置，确保在屏幕内
-        let left = mouseX;
-        let top = mouseY;
+        let left = x;
+        let top = y;
 
         // 如果菜单超出右边界，调整到左侧
         if (left + menuWidth > windowWidth) {
-            left = mouseX - menuWidth;
+            left = x - menuWidth;
         }
 
         // 如果菜单超出下边界，调整到上方
         if (top + menuHeight > windowHeight) {
-            top = mouseY - menuHeight;
+            top = y - menuHeight;
         }
 
         // 确保菜单不超出左边界和上边界

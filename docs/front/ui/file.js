@@ -1,5 +1,6 @@
 (function () {
     notebook.file = {
+        cache: null,
         open: async (path) => {
             const content = await window.api.read_file(path);
             data = JSON.parse(content);
@@ -25,6 +26,9 @@
                     canvas: notebook.canvas.save(),
                     toolbar: notebook.toolbar.manager.save()
                 });
+                if (notebook.file.cache == content) {
+                    return;
+                }
                 const filePath = notebook.Env.current_file;
                 if (!filePath) throw new Error("No file path");
 
@@ -41,7 +45,7 @@
                 const fileInput = document.createElement('input');
                 fileInput.type = 'file';
                 fileInput.accept = 'image/*'; // Only accept image files
-                
+
                 // Create a promise to handle the file selection
                 const filePromise = new Promise((resolve, reject) => {
                     fileInput.onchange = (event) => {
@@ -52,21 +56,21 @@
                             reject(new Error('No file selected'));
                         }
                     };
-                    
+
                     fileInput.oncancel = () => {
                         reject(new Error('File selection cancelled'));
                     };
                 });
-                
+
                 // Trigger the file selection dialog
                 fileInput.click();
-                
+
                 // Wait for the user to select a file
                 const file = await filePromise;
-                
+
                 // Upload the file using the API
                 const result = await window.api.upload_picture(file);
-                
+
                 if (result.success) {
                     notebook.info('Picture uploaded successfully: ' + result.url);
                     return result.url;
