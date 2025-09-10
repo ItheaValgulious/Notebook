@@ -12,6 +12,7 @@
         this.pos = notebook.utils.Point.zero();
         this.scale = 1;
         this.dirty_rect = this.screen_rect();
+        this.move_interval = 0;
     }
     Canvas.prototype.screen_rect = function () {
         return notebook.utils.Rect.full().scale(1 / this.scale).move(this.pos.x / this.scale, this.pos.y / this.scale);
@@ -184,12 +185,12 @@
         this.objects = [];
         this.content_container.innerHTML = '';
         notebook.stroke_styles.load(data.styles);
-        
+
         // Load background configuration
         if (data.background) {
             notebook.Env.background = data.background;
         }
-        
+
         this.set_style();
 
         for (var o of data.objects) {
@@ -213,6 +214,21 @@
         this.pos.y += dy;
         this.add_dirty_rect(this.screen_rect());
         this.set_style();
+    }
+    Canvas.prototype.locate = function (x, y) {
+        if (this.move_interval) clearInterval(this.move_interval);
+        var center = this.get_true_position(this.width / 2, this.height / 2);
+        var dx = (x-center.x)*this.scale, dy = (y-center.y)*this.scale;
+        var sx = dx / 30, sy = dy / 30;
+        var counter=0;
+        this.move_interval = setInterval(() => {
+            if(counter==30){
+                clearInterval(this.move_interval);
+                this.move_interval=null;
+            }
+            this.move(sx, sy);
+            counter++;
+        }, 1000 / 60);
     }
     Canvas.prototype.set_style = function () {
         // this.content_container.style.left = -this.pos.x / this.dp + 'px';
@@ -244,6 +260,11 @@
         this.set_style();
         this.add_dirty_rect(this.screen_rect());
     }
+
+
+    // Initialize find results array
+    Canvas.prototype.find_results = [];
+    Canvas.prototype.current_find_index = 0;
 
     window.notebook.Canvas = Canvas;
 })();

@@ -98,16 +98,14 @@
         save() {
             return {
                 "type": "picture",
-                "pos": { x: this.x, y: this.y },
+                "pos": { x: this.pos.x, y: this.pos.y },
                 "width": this.width,
                 "height": this.height,
                 "src": this.img.src
             };
         }
         static load(obj) {
-            let picture = new PictureObj(obj.src, obj.width, obj.height);
-            picture.pos.x = obj.pos.x;
-            picture.pos.y = obj.pos.y;
+            let picture = new PictureObj(obj.src,new notebook.utils.Point(obj.pos.x,obj.pos.y), obj.width, obj.height);
             return picture;
         }
         update() {

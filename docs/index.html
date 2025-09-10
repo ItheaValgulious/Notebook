@@ -35,6 +35,8 @@
 
     <script src="front/canvas/canvas.js"></script>
     <script src="front/canvas/pen.js"></script>
+    
+    <script src="front/canvas/find.js"></script>
 
     <script src="front/ui/info.js"></script>
     <script src="front/ui/sign.js"></script>
@@ -50,25 +52,22 @@
 
 <body>
     <div class="toolbar">
-        <button id="tree-btn" title="Tree">
+        <button id="tree-btn" class="btn btn-toolbar" title="Tree">
             <i class="fas fa-sitemap"></i></button>
         <div class="tree-panel" id="tree-panel">
             <div class="button-container">
-                <button class="logout-btn" title="Logout">
+                <button class="logout-btn btn btn-small" title="Logout">
                     <i class="fas fa-sign-out-alt"></i></button>
-                <button class="download-btn" title="Download">
+                <button class="download-btn btn btn-small" title="Download">
                     <i class="fas fa-download"></i></button>
-                <button class="return-btn" title="Return to Root">
+                <button class="return-btn btn btn-small" title="Return to Root">
                     <i class="fas fa-home"></i></button>
             </div>
             <div id="file-info"></div>
             <div id="tree-content"></div>
         </div>
-        <button id="setting-btn" data-brush="setting" title="Setting" style="display: none">
-            <i class="fas fa-gear"></i>
-        </button>
-        <button id="mode-btn" data-brush="mode" title="Mode" style="display: none">
-            <i class="fas fa-tools"></i>
+        <button id="save-btn" class="btn btn-toolbar" title="Save">
+            <i class="fas fa-save"></i>
         </button>
         <div class="dropdown" id="mode-dropdown">
             <div onclick="notebook.toolbar.events.set_mode('page')">
@@ -82,7 +81,31 @@
             </div>
         </div>
         <div class="divider"></div>
-        <button class="brush" data-brush="1" title="Brush 1">
+
+        <button id="setscale-btn" class="btn btn-toolbar" data-brush="setscale" title="Set Scale">
+            <i class="fas fa-expand"></i>
+        </button>
+
+        <button id="find-btn" class="btn btn-toolbar" data-brush="find" title="Find">
+            <i class="fas fa-search"></i>
+        </button>
+        <div class="config-panel" id="find-config">
+            Find:
+            <div class="input-container">
+                <input type="text" id="find-input" placeholder="Enter text to find..." />
+            </div>
+            <div class="find-results-info" id="find-results-info">Search Results: 0/0</div>
+            <div class="find-navigation">
+                <button id="find-prev-btn" class="btn btn-small" title="Previous Result">
+                    <i class="fas fa-chevron-up"></i>
+                </button>
+                <button id="find-next-btn" class="btn btn-small" title="Next Result">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+        </div>
+        <div class="divider"></div>
+        <button class="brush btn btn-toolbar" data-brush="1" title="Brush 1">
             <span class="brush-preview"></span>
         </button>
         <div class="config-panel" id="brush-config-1">
@@ -97,7 +120,7 @@
                 <span class="slider-label" id="lightness-label-1">Lightness: 50</span>
             </div>
         </div>
-        <button class="brush" data-brush="2" title="Brush 2">
+        <button class="brush btn btn-toolbar" data-brush="2" title="Brush 2">
             <span class="brush-preview"></span>
         </button>
         <div class="config-panel" id="brush-config-2">
@@ -112,7 +135,7 @@
                 <span class="slider-label" id="lightness-label-2">Lightness: 50</span>
             </div>
         </div>
-        <button class="brush" data-brush="3" title="Brush 3">
+        <button class="brush btn btn-toolbar" data-brush="3" title="Brush 3">
             <span class="brush-preview"></span>
         </button>
         <div class="config-panel" id="brush-config-3">
@@ -127,7 +150,7 @@
                 <span class="slider-label" id="lightness-label-3">Lightness: 50</span>
             </div>
         </div>
-        <button class="brush" data-brush="4" title="Brush 4">
+        <button class="brush btn btn-toolbar" data-brush="4" title="Brush 4">
             <span class="brush-preview"></span>
         </button>
         <div class="config-panel" id="brush-config-4">
@@ -142,7 +165,7 @@
                 <span class="slider-label" id="lightness-label-4">Lightness: 50</span>
             </div>
         </div>
-        <button class="brush" data-brush="5" title="Brush 5">
+        <button class="brush btn btn-toolbar" data-brush="5" title="Brush 5">
             <span class="brush-preview"></span>
         </button>
         <div class="config-panel" id="brush-config-5">
@@ -157,7 +180,7 @@
                 <span class="slider-label" id="lightness-label-5">Lightness: 50</span>
             </div>
         </div>
-        <button id="eraser-btn" data-brush="eraser" title="Eraser">
+        <button id="eraser-btn" class="btn btn-toolbar" data-brush="eraser" title="Eraser">
             <i class="fas fa-eraser"></i>
         </button>
         <div class="config-panel" id="eraser-config">
@@ -181,7 +204,7 @@
                 </label>
             </div>
         </div>
-        <button id="background-btn" data-brush="background" title="Background">
+        <button id="background-btn" class="btn btn-toolbar" data-brush="background" title="Background">
             <i class="fas fa-gear"></i>
         </button>
         <div class="config-panel" id="background-config">
@@ -192,7 +215,7 @@
                 <span class="slider-label" id="background-lightness-label">Lightness: 50</span>
             </div>
             <div class="slider-container">
-                <select id="background-type" class="slider">
+                <select id="background-type" class="slider select">
                     <option value="empty">Empty</option>
                     <option value="line">Line</option>
                     <option value="grid">Grid</option>
@@ -200,21 +223,15 @@
                 </select>
             </div>
         </div>
-        <button id="lasso-btn" data-brush="lasso" title="Lasso">
+        <button id="lasso-btn" class="btn btn-toolbar" data-brush="lasso" title="Lasso">
             <i class="fas fa-draw-polygon"></i>
         </button>
         <div class="divider"></div>
-        <button id="image-btn" data-brush="image" title="Insert Image">
+        <button id="image-btn" class="btn btn-toolbar" data-brush="image" title="Insert Image">
             <i class="fas fa-image"></i>
         </button>
-        <button id="markdown-btn" data-brush="markdown" title="Insert Markdown">
+        <button id="markdown-btn" class="btn btn-toolbar" data-brush="markdown" title="Insert Markdown">
             <i class="fas fa-code"></i>
-        </button>
-        <button id="save-btn" title="Save">
-            <i class="fas fa-save"></i>
-        </button>
-        <button id="setscale-btn" data-brush="setscale" title="Set Scale">
-            <i class="fas fa-expand"></i>
         </button>
     </div>
 </body>

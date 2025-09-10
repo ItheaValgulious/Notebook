@@ -13,6 +13,8 @@ window.onload = async () => {
     notebook.canvas = new notebook.Canvas();
     notebook.canvas.init();
 
+    notebook.finder.init(notebook.canvas);
+
     document.addEventListener('contextmenu', function (event) {
         event.preventDefault();
     });
@@ -22,4 +24,5 @@ window.onload = async () => {
             notebook.file.save_file();
         }
     }, 60000);
+    
 }

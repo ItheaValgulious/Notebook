@@ -61,9 +61,7 @@
 
         }),
         new UIButton('markdown', 'markdown', () => { notebook.Env.current_pen['pen'] = 'markdown_creator'; }),
-
-        new UIButton('setting', 'setting'),
-        new UIButton('mode', 'mode')
+        new UIButton('find', 'find', () => { notebook.Env.current_pen['pen'] = 'find'; }),
     ];
 
 
@@ -242,7 +240,7 @@
             treePanelDom.classList.toggle('show');
         });
 
-        // Tool Buttons (Brush, Eraser, Background, Lasso, Image, Markdown, Setting, Mode)
+        // Tool Buttons (Brush, Eraser, Background, Lasso, Image, Markdown)
 
         const toolButtons = [
             ...document.querySelectorAll('.brush'),
@@ -251,8 +249,7 @@
             document.getElementById('lasso-btn'),
             document.getElementById('image-btn'),
             document.getElementById('markdown-btn'),
-            document.getElementById('setting-btn'),
-            document.getElementById('mode-btn')
+            document.getElementById('find-btn')
         ];
         selectedTool = null;
 
@@ -280,8 +277,6 @@
                             document.getElementById('eraser-config').classList.remove('show');
                         } else if (b.id === 'background-btn') {
                             document.getElementById('background-config').classList.remove('show');
-                        } else if (b.id === 'mode-btn') {
-                            document.getElementById('mode-dropdown').classList.remove('show');
                         }
                     });
                     brush.classList.add('active');
@@ -343,8 +338,6 @@
                         document.getElementById(`brush-config-${b.dataset.brush}`).classList.remove('show');
                     } else if (b.id === 'eraser-btn') {
                         document.getElementById('eraser-config').classList.remove('show');
-                    } else if (b.id === 'mode-btn') {
-                        document.getElementById('mode-dropdown').classList.remove('show');
                     }
                 });
                 eraserBtn.classList.add('active');
@@ -423,8 +416,6 @@
                         document.getElementById(`brush-config-${b.dataset.brush}`).classList.remove('show');
                     } else if (b.id === 'eraser-btn') {
                         document.getElementById('eraser-config').classList.remove('show');
-                    } else if (b.id === 'mode-btn') {
-                        document.getElementById('mode-dropdown').classList.remove('show');
                     }
                 });
                 backgroundBtn.classList.add('active');
@@ -481,8 +472,6 @@
                         document.getElementById('eraser-config').classList.remove('show');
                     } else if (b.id === 'background-btn') {
                         document.getElementById('background-config').classList.remove('show');
-                    } else if (b.id === 'mode-btn') {
-                        document.getElementById('mode-dropdown').classList.remove('show');
                     }
                 }
             });
@@ -502,8 +491,6 @@
                         document.getElementById('eraser-config').classList.remove('show');
                     } else if (b.id === 'background-btn') {
                         document.getElementById('background-config').classList.remove('show');
-                    } else if (b.id === 'mode-btn') {
-                        document.getElementById('mode-dropdown').classList.remove('show');
                     }
                 }
             });
@@ -524,8 +511,8 @@
                         document.getElementById('eraser-config').classList.remove('show');
                     } else if (b.id === 'background-btn') {
                         document.getElementById('background-config').classList.remove('show');
-                    } else if (b.id === 'mode-btn') {
-                        document.getElementById('mode-dropdown').classList.remove('show');
+                    } else if (b.id === 'find-btn') {
+                        document.getElementById('find-config').classList.remove('show');
                     }
                 }
             });
@@ -534,49 +521,64 @@
             markdownUIButton.on_choose(null);
         });
 
-        // Setting
-        const settingBtn = document.getElementById('setting-btn');
-        const settingUIButton = uiButtons.find(btn => btn.id === 'setting');
-        settingBtn.addEventListener('click', () => {
-            toolButtons.forEach(b => {
-                if (!b.classList.contains('brush')) {
+        // Find Button
+        const findBtn = document.getElementById('find-btn');
+        const findConfig = document.getElementById('find-config');
+        const findInput = document.getElementById('find-input');
+        const findUIButton = uiButtons.find(btn => btn.id === 'find');
+
+        findBtn.addEventListener('click', () => {
+            const rect = findBtn.getBoundingClientRect();
+            if (selectedTool === findBtn) {
+                findConfig.classList.toggle('show');
+                findConfig.style.top = `${rect.top}px`;
+            } else {
+                toolButtons.forEach(b => {
                     b.classList.remove('active');
-                    if (b.id === 'eraser-btn') {
+                    if (b.classList.contains('brush')) {
+                        document.getElementById(`brush-config-${b.dataset.brush}`).classList.remove('show');
+                    } else if (b.id === 'eraser-btn') {
                         document.getElementById('eraser-config').classList.remove('show');
                     } else if (b.id === 'background-btn') {
                         document.getElementById('background-config').classList.remove('show');
-                    } else if (b.id === 'mode-btn') {
-                        document.getElementById('mode-dropdown').classList.remove('show');
                     }
-                }
-            });
-            settingBtn.classList.add('active');
-            selectedTool = settingBtn;
-            settingUIButton.on_choose(null);
+                });
+                findBtn.classList.add('active');
+                selectedTool = findBtn;
+                findConfig.classList.add('show');
+                findConfig.style.top = `${rect.top}px`;
+                findUIButton.on_choose(null);
+            }
         });
 
-        // Mode Dropdown
-        const modeBtn = document.getElementById('mode-btn');
-        const modeDropdown = document.getElementById('mode-dropdown');
-        const modeUIButton = uiButtons.find(btn => btn.id === 'mode');
-        modeBtn.addEventListener('click', () => {
-            toolButtons.forEach(b => {
-                if (!b.classList.contains('brush')) {
-                    b.classList.remove('active');
-                    if (b.id === 'eraser-btn') {
-                        document.getElementById('eraser-config').classList.remove('show');
-                    } else if (b.id === 'background-btn') {
-                        document.getElementById('background-config').classList.remove('show');
-                    }
+        // Allow Enter key to trigger find
+        findInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                if (!notebook.finder.find_results.length) notebook.finder.perform_find(findInput.value);
+                else{
+                    if(e.shiftKey)notebook.finder.find_prev();
+                    else notebook.finder.find_next();
                 }
-            });
-            modeBtn.classList.add('active');
-            selectedTool = modeBtn;
-            modeDropdown.classList.toggle('show');
-            const rect = modeBtn.getBoundingClientRect();
-            modeDropdown.style.top = `${rect.top}px`;
-            modeUIButton.on_choose(null);
+            }
         });
+
+        // Real-time search as user types
+        findInput.addEventListener('input', (e) => {
+            notebook.finder.perform_find(findInput.value);
+        });
+
+        // Find navigation buttons
+        const findPrevBtn = document.getElementById('find-prev-btn');
+        const findNextBtn = document.getElementById('find-next-btn');
+
+        findPrevBtn.addEventListener('click', () => {
+            notebook.finder.find_prev();
+        });
+
+        findNextBtn.addEventListener('click', () => {
+            notebook.finder.find_next();
+        });
+
 
         // Save Button
         const saveBtn = document.getElementById('save-btn');
@@ -601,14 +603,14 @@
 
         // Close dropdowns and panels when clicking outside
         document.addEventListener('click', (e) => {
-            if (!modeBtn.contains(e.target) && !modeDropdown.contains(e.target)) {
-                modeDropdown.classList.remove('show');
-            }
             if (!eraserBtn.contains(e.target) && !eraserConfig.contains(e.target)) {
                 eraserConfig.classList.remove('show');
             }
             if (!backgroundBtn.contains(e.target) && !backgroundConfig.contains(e.target)) {
                 backgroundConfig.classList.remove('show');
+            }
+            if (!findBtn.contains(e.target) && !findConfig.contains(e.target)) {
+                findConfig.classList.remove('show');
             }
             brushes.forEach((b) => {
                 const configPanel = document.getElementById(`brush-config-${b.dataset.brush}`);

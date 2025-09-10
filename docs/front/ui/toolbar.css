@@ -10,13 +10,53 @@
     align-items: center;
     padding-top: 10px;
     box-sizing: border-box;
-    z-index: 1;
+    z-index: 2;
+}
+
+/* Base button styles for unified appearance */
+.btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn:hover {
+    background-color: #555;
+}
+
+.btn:focus {
+    outline: none;
+    box-shadow: 0 0 3px rgba(0, 123, 255, 0.3);
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+/* Toolbar button variant */
+.btn-toolbar {
+    width: 40px;
+    height: 40px;
+    margin: 2px 0;
+    font-size: 20px;
+    position: relative;
+}
+
+.btn-toolbar.active {
+    background-color: #007bff;
 }
 
 .toolbar button {
     width: 40px;
     height: 40px;
-    margin: 5px 0;
+    margin: 2px 0;
     background: none;
     border: none;
     color: white;
@@ -93,6 +133,18 @@
     margin-bottom: 10px;
     padding: 5px 0;
     border-bottom: 1px solid #444;
+}
+
+/* Small button variant for tree panel */
+.btn-small {
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    background-color: #555;
+}
+
+.btn-small:hover {
+    background-color: #777;
 }
 
 .tree-panel .return-btn,
@@ -198,6 +250,57 @@
 
 .checkbox-label input[type="checkbox"] {
     margin-right: 8px;
+}
+
+.input-container {
+    margin: 10px 0;
+}
+
+.input-container input[type="text"] {
+    width: 150px;
+    padding: 5px;
+    border: 1px solid #666;
+    border-radius: 3px;
+    background-color: #333;
+    color: white;
+    font-size: 12px;
+}
+
+.input-container input[type="text"]::placeholder {
+    color: #999;
+}
+
+.input-container input[type="text"]:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+/* Action button variant */
+.btn-action {
+    padding: 5px 10px;
+    background-color: #007bff;
+    font-size: 12px;
+    margin: 5px 0;
+    font-weight: 500;
+}
+
+.btn-action:hover {
+    background-color: #0056b3;
+}
+
+.action-btn {
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    margin: 5px 0;
+}
+
+.action-btn:hover {
+    background-color: #0056b3;
     cursor: pointer;
 }
 
@@ -222,6 +325,29 @@
 .slider {
     width: 100px;
     margin-right: 10px;
+}
+
+/* Select element styling to match unified button system */
+.select {
+    background-color: #555;
+    color: white;
+    border: 1px solid #666;
+    border-radius: 4px;
+    padding: 2px 5px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.select:hover {
+    background-color: #666;
+    border-color: #777;
+}
+
+.select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 3px rgba(0, 123, 255, 0.3);
 }
 
 .slider-container select {
@@ -267,4 +393,51 @@
 
 .config-panel{
     color: white;
+    font-size: 16px;
+}
+
+.find-results-info {
+    margin: 10px 0;
+    font-size: 12px;
+    color: #ccc;
+    text-align: center;
+    padding: 5px 0;
+    border-top: 1px solid #666;
+    border-bottom: 1px solid #666;
+}
+
+.find-navigation {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.find-navigation .btn-small {
+    width: 25px;
+    height: 25px;
+    background-color: #555;
+    border: 1px solid #666;
+    border-radius: 3px;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.find-navigation .btn-small:hover {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.find-navigation .btn-small:active {
+    transform: translateY(1px);
+}
+
+.find-navigation .btn-small:focus {
+    outline: none;
+    box-shadow: 0 0 3px rgba(0, 123, 255, 0.3);
 }

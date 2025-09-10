@@ -56,13 +56,13 @@ canvas.notebook_canvas {
     outline: rgba(98, 145, 255, 0.79) 5px solid;
 }
 
-.vditor-ir pre.vditor-reset:focus {
+/* .vditor-ir pre.vditor-reset:focus {
     background: none !important;
 }
 
 .vditor-ir pre.vditor-reset {
     background: none !important;
-}
+} */
 
 .vditor-toolbar--hide {
     display: none;
