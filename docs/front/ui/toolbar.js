@@ -19,7 +19,12 @@
 
     function set_eraser(obj) {
         notebook.Env.current_pen['pen'] = 'eraser';
-        notebook.Env.eraser_radius = obj.width * 2;
+        
+        // Set eraser config values
+        notebook.Env.eraser.stroke = document.getElementById('eraser-stroke').checked;
+        notebook.Env.eraser.picture = document.getElementById('eraser-picture').checked;
+        notebook.Env.eraser.markdown = document.getElementById('eraser-markdown').checked;
+        notebook.Env.eraser.radius = obj.width * 2;
     }
 
 
@@ -78,6 +83,7 @@
             if(e.key=='s'&&e.ctrlKey){
                 e.preventDefault();
                 notebook.file.save_file();
+                notebook.tree.update();
             }
         });
 
@@ -293,6 +299,32 @@
             eraserUIButton.on_config({ width });
         });
 
+        // Eraser checkboxes
+        const eraserStroke = document.getElementById('eraser-stroke');
+        const eraserPicture = document.getElementById('eraser-picture');
+        const eraserMarkdown = document.getElementById('eraser-markdown');
+
+        eraserStroke.addEventListener('change', () => {
+            if (!notebook.Env.eraser) {
+                notebook.Env.eraser = {};
+            }
+            notebook.Env.eraser.stroke = eraserStroke.checked;
+        });
+
+        eraserPicture.addEventListener('change', () => {
+            if (!notebook.Env.eraser) {
+                notebook.Env.eraser = {};
+            }
+            notebook.Env.eraser.picture = eraserPicture.checked;
+        });
+
+        eraserMarkdown.addEventListener('change', () => {
+            if (!notebook.Env.eraser) {
+                notebook.Env.eraser = {};
+            }
+            notebook.Env.eraser.markdown = eraserMarkdown.checked;
+        });
+
         // Lasso
         const lassoBtn = document.getElementById('lasso-btn');
         const lassoUIButton = uiButtons.find(btn => btn.id === 'lasso');
@@ -395,6 +427,21 @@
         const saveBtn = document.getElementById('save-btn');
         saveBtn.addEventListener('click', () => {
             notebook.file.save_file();
+        });
+
+        // SetScale Button
+        const setscaleBtn = document.getElementById('setscale-btn');
+        setscaleBtn.addEventListener('click', () => {
+            if (notebook.canvas) {
+                if(notebook.canvas.scale==1)return;
+                var scale_loop=setInterval(()=>{
+                    if(Math.abs(notebook.canvas.scale-1)<0.01){
+                        clearInterval(scale_loop);
+                        notebook.canvas.set_cale(1/notebook.canvas.scale);
+                    }
+                    notebook.canvas.set_scale(1+0.1*Math.sign(1-notebook.canvas.scale));
+                },10);
+            }
         });
 
         // Close dropdowns and panels when clicking outside

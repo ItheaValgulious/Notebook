@@ -83,7 +83,7 @@
                 const username = document.getElementById("username").value;
                 const password = document.getElementById("password").value;
                 try {
-                    const data = await window.api.signin(username, password);
+                    const data = await notebook.api.signin(username, password);
                     if (data.token) {
                         localStorage.setItem('token', data.token);
                         hide_window();
@@ -103,7 +103,7 @@
                 const username = document.getElementById("username").value;
                 const password = document.getElementById("password").value;
                 try {
-                    const data = await window.api.signup(username, password);
+                    const data = await notebook.api.signup(username, password);
                     if (data.token) {
                         localStorage.setItem('token', data.token);
                         hide_window();
@@ -134,7 +134,7 @@
         // Check if user is already authenticated
         const storedToken = localStorage.getItem('token');
         if (storedToken !== null) {
-            const checkResult = await window.api.check(storedToken);
+            const checkResult = await notebook.api.check(storedToken);
             if (checkResult.success) {
                 return storedToken; // Return existing valid token
             }

@@ -4,7 +4,7 @@ window.onload = async () => {
     notebook.Config.canvas_height = window.innerHeight;
     document.documentElement.requestFullscreen();
 
-    window.api = new notebook.Api();
+    notebook.api = new notebook.Api();
     await notebook.setup_sign();
 
     notebook.init_toolbar();

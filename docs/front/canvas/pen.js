@@ -29,12 +29,22 @@
         this.current_stroke = null;
     }.bind(pencil);
 
+    function check_deletable(obj) {
+        if (notebook.Env.eraser.stroke && obj instanceof notebook.Stroke)
+            return true;
+        if (notebook.Env.eraser.picture && obj instanceof notebook.PictureObj)
+            return true;
+        if (notebook.Env.eraser.markdown && obj instanceof notebook.MarkdownArea)
+            return true;
+        return false;
+    }
+
     eraser.on_move = function (canvas, event, point) {
         var delete_all_selected = false;
         for (var i = 0; i < canvas.objects.length; i++) {
             var obj = canvas.objects[i];
-            if (obj.collide_circle(point.x, point.y, notebook.Env.eraser_radius)) {
-                if (!obj.selected) {
+            if (obj.collide_circle(point.x, point.y, notebook.Env.eraser.radius)) {
+                if (!obj.selected&&check_deletable(obj)) {
                     canvas.remove_object(obj);
                     i--;
                 } else {

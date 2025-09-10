@@ -46,8 +46,8 @@
         return p.x >= this.x1 && p.x <= this.x2 && p.y >= this.y1 && p.y <= this.y2;
     }
     Rect.prototype.add = function (x, y) {
-        if(this.is_empty()){
-            this.x1=this.x2=x,this.y1=this.y2=y;
+        if (this.is_empty()) {
+            this.x1 = this.x2 = x, this.y1 = this.y2 = y;
         }
         this.x1 = Math.min(this.x1, x);
         this.y1 = Math.min(this.y1, y);
@@ -106,11 +106,25 @@
         }, this.interval);
     }
 
+    function generate_filename() {
+        let date = new Date();
+        let year = date.getFullYear();
+        let month = (date.getMonth() + 1).toString().padStart(2, '0');
+        let day = date.getDate().toString().padStart(2, '0');
+        let hours = date.getHours().toString().padStart(2, '0');
+        let minutes = date.getMinutes().toString().padStart(2, '0');
+        let seconds = date.getSeconds().toString().padStart(2, '0');
+
+        var filename = `note_${year}_${month}_${day}_${hours}_${minutes}_${seconds}.fire`;
+        return filename;
+    }
+
     window.notebook.utils = {
         distance: distance,
         distance_to_line: distance_to_line,
         Rect: Rect,
         Point: Point,
-        Waiter: Waiter
+        Waiter: Waiter,
+        generate_filename:generate_filename
     };
 })();

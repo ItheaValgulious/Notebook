@@ -25,7 +25,12 @@
             'touch': 'touch_mover',
             'mouse': 'touch_mover'
         },
-        eraser_radius: 10,
+        eraser: {
+            stroke: true,
+            picture: true,
+            markdown: true,
+            radius: 10,
+        },
         current_pointer_type: null,
         current_style: 'pen1',
         current_file: null,

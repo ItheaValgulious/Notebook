@@ -109,11 +109,30 @@
         init() {
             this.treePanel.init(document.getElementById('tree-content'));
             this.set_path('/')
+            
+            // Add return button event listener
+            const returnBtn = document.querySelector('.return-btn');
+            if (returnBtn) {
+                returnBtn.addEventListener('click', () => {
+                    this.set_path('/');
+                });
+            }
+
+            // Add download button event listener
+            const downloadBtn = document.querySelector('.download-btn');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', () => {
+                    notebook.api.download();
+                });
+            }
         }
         async set_path(path) {
             this.path = path;
-            this.tree = await window.api.read_folder(path);
+            this.tree = await notebook.api.read_folder(path);
             this.treePanel.set_tree(this.construct_render_tree_obj(this.tree));
+        }
+        update() {
+            this.set_path(this.path);
         }
         rename(obj, dom) {
             var path = obj.data.path;
@@ -132,8 +151,8 @@
 
             var _rename = (e) => {
                 this.clear_select();
-                window.api.rename(path, label.innerText);
-                this.set_path(this.path);
+                notebook.api.rename(path, label.innerText);
+                this.update();
             }
             var func = (e) => {
                 if (e.key != 'Enter' && e.key != 'Escape') return;
@@ -189,29 +208,21 @@
                             {
                                 text: 'New File', action: async () => {
 
-                                    let date = new Date();
-                                    let year = date.getFullYear();
-                                    let month = (date.getMonth() + 1).toString().padStart(2, '0');
-                                    let day = date.getDate().toString().padStart(2, '0');
-                                    let hours = date.getHours().toString().padStart(2, '0');
-                                    let minutes = date.getMinutes().toString().padStart(2, '0');
-                                    let seconds = date.getSeconds().toString().padStart(2, '0');
+                                    var filename = notebook.utils.generate_filename();
 
-                                    var filename = `note_${year}_${month}_${day}_${hours}_${minutes}_${seconds}.fire`;
-
-                                    await window.api.save_file(obj.data.path + '/' + filename, JSON.stringify({
+                                    await notebook.api.save_file(obj.data.path + '/' + filename, JSON.stringify({
                                         canvas: notebook.Config.empty_file_canvas_template,
                                         toolbar: notebook.toolbar.manager.save()
                                     }));
-                                    this.set_path(this.path);
+                                    this.update();
 
                                 }, type: 'item'
                             },
                             {
                                 text: 'New Folder', action: async () => {
                                     var folder_name = 'New_Folder'
-                                    await window.api.new_folder(obj.data.path + '/' + folder_name);
-                                    this.set_path(this.path);
+                                    await notebook.api.new_folder(obj.data.path + '/' + folder_name);
+                                    this.update();
                                 }, type: 'item'
                             },
                             { type: 'seperate' },
@@ -223,9 +234,9 @@
                             { type: 'seperate' },
                             {
                                 text: 'Delete', action: async () => {
-                                    await window.api.delete(obj.data.path);
+                                    await notebook.api.delete(obj.data.path);
                                     // 刷新树显示
-                                    this.set_path(this.path);
+                                    this.update();
                                 }, type: 'item'
                             },
                             { type: 'seperate' },
@@ -233,9 +244,8 @@
                                 text: "Open Folder",
                                 action: async () => {
                                     this.path = obj.data.path;
-                                    this.tree.set_path(this.path);
-                                }
-
+                                    this.update();
+                                }, type: 'item'
                             }
                         ], e.clientX, e.clientY);
                     } else {
@@ -248,8 +258,8 @@
                             },
                             {
                                 text: 'Delete', action: async () => {
-                                    await window.api.delete(obj.data.path);
-                                    this.set_path(this.path);
+                                    await notebook.api.delete(obj.data.path);
+                                    this.update();
                                 }, type: 'item'
                             },
                         ], e.clientX, e.clientY);

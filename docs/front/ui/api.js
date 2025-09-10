@@ -4,7 +4,7 @@
          * Local FastAPI Notebook Server
          * @param {string} baseUrl - Base URL of the FastAPI server (default: http://127.0.0.1:8000)
          */
-        constructor(baseUrl = 'http://192.168.137.1:8000') {
+        constructor(baseUrl = 'http://124.222.61.175:8000') {
             this.baseUrl = baseUrl;
             this.token = null;
         }
@@ -222,6 +222,38 @@
         // Helper method to set token (useful if you have token from elsewhere)
         setToken(token) {
             this.token = token;
+        }
+
+        async download() {
+            try {
+                const response = await fetch(`${this.baseUrl}/download?token=${this.token}`);
+                
+                if (!response.ok) {
+                    return false;
+                }
+                
+                // Create a blob from the response
+                const blob = await response.blob();
+                
+                // Create a download link and trigger the download
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'notebook-download';
+                document.body.appendChild(a);
+                a.click();
+                
+                // Clean up
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 0);
+                
+                return true;
+            } catch (error) {
+                console.error('Download error:', error);
+                return false;
+            }
         }
     }
 

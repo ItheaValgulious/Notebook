@@ -2,7 +2,7 @@
     notebook.file = {
         cache: null,
         open: async (path) => {
-            const content = await window.api.read_file(path);
+            const content = await notebook.api.read_file(path);
             data = JSON.parse(content);
             notebook.canvas.load(data.canvas);
             notebook.toolbar.manager.load(data.toolbar);
@@ -29,10 +29,13 @@
                 if (notebook.file.cache == content) {
                     return;
                 }
-                const filePath = notebook.Env.current_file;
-                if (!filePath) throw new Error("No file path");
+                var filePath = notebook.Env.current_file;
+                if (!filePath) {
+                    notebook.info('No current file path! File will be saved in folder temps!');
+                    filePath = notebook.Env.current_file = '/temps/' + notebook.utils.generate_filename();
+                }
 
-                await window.api.save_file(filePath, content);
+                await notebook.api.save_file(filePath, content);
                 notebook.info('File saved');
             } catch (error) {
                 console.error('Error while saving a file:', error);
@@ -69,7 +72,7 @@
                 const file = await filePromise;
 
                 // Upload the file using the API
-                const result = await window.api.upload_picture(file);
+                const result = await notebook.api.upload_picture(file);
 
                 if (result.success) {
                     notebook.info('Picture uploaded successfully: ' + result.url);
