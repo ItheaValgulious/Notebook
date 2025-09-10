@@ -27,7 +27,7 @@
                 mode: 'ir',
                 focus: this.start_edit.bind(this),
                 blur: this.end_edit.bind(this),
-                value:value
+                value: value
             };
             this.vditor = new Vditor(this.dom, config);
             this.update();
@@ -53,6 +53,46 @@
         vditor_inited() {
             // this.vditor.updateToolbarConfig({ hide: true });
             // this.vditor.focus();
+
+            // Add type event listener to check for scrollbars and adjust height
+            this.addTypeEventListener();
+        }
+
+        addTypeEventListener() {
+            // Add input event listener to detect content changes
+            this.vditor.vditor.ir.element.addEventListener('input', () => {
+                this.checkScrollbarAndAdjustHeight();
+            });
+
+            // Also add keyup event for comprehensive typing detection
+            this.vditor.vditor.ir.element.addEventListener('keyup', () => {
+                this.checkScrollbarAndAdjustHeight();
+            });
+        }
+
+        checkScrollbarAndAdjustHeight() {
+            const editorElement = this.vditor.vditor.ir.element;
+            const scrollHeight = editorElement.scrollHeight;
+            const clientHeight = editorElement.clientHeight;
+
+            // Check if there's a scrollbar (scrollHeight > clientHeight)
+            if (scrollHeight > clientHeight) {
+                // Calculate the difference and add some extra space
+                const heightDifference = scrollHeight - clientHeight;
+                const extraSpace = 50; // Add 50px extra space
+
+                var delta = heightDifference + extraSpace;
+
+                // Increase the height
+                this.height += delta;
+                this.canvas.move(0,delta)
+
+                // Update the DOM element dimensions
+                this.update();
+
+                // Also update the vditor editor height
+                this.vditor.vditor.ir.element.style.height = (this.height / notebook.Config.canvas_dp) + 'px';
+            }
         }
 
         focus() {
@@ -81,7 +121,7 @@
 
         draw(ctx) { }
 
-        
+
         set_selected(selected) {
             super.set_selected(selected);
             if (selected) this.dom.classList.add('selected');
@@ -93,10 +133,12 @@
             this.update();
         }
         start_edit() {
-            this.canvas.content_container.style.zIndex = 1;
+            this.dom.style.pointerEvents='auto';
+            // this.canvas.content_container.style.zIndex = 1;
         }
         end_edit() {
-            this.canvas.content_container.style.zIndex = -1;
+            this.dom.style.pointerEvents='none';
+            // this.canvas.content_container.style.zIndex = -1;
         }
 
         on_remove_from_canvas() {

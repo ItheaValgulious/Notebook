@@ -1,7 +1,4 @@
 (function () {
-    function virtual_func_error() {
-        throw new Error('virtual function not implemented');
-    }
     class CanvasObj {
         constructor() {
             this.rect = notebook.utils.Rect.empty();
@@ -38,13 +35,13 @@
             return true;
         }
         draw(ctx) {
-            virtual_func_error();
+            notebook.utils.virtual_func_error();
         }
         save() {
-            virtual_func_error();
+            notebook.utils.virtual_func_error();
         }
         static load(obj) {
-            virtual_func_error();
+            notebook.utils.virtual_func_error();
         }
         update(){}
         on_add_to_canvas() { }

@@ -84,44 +84,20 @@
     display: block;
 }
 
-.tree-panel .collapse-btn {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    width: 20px;
-    height: 20px;
-    background-color: #555;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-size: 12px;
-    border-radius: 3px;
+
+
+.tree-panel .button-container {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    justify-content: flex-end;
+    gap: 5px;
+    margin-bottom: 10px;
+    padding: 5px 0;
+    border-bottom: 1px solid #444;
 }
 
-.tree-panel .return-btn {
-    position: absolute;
-    top: 5px;
-    right: 30px;
-    width: 20px;
-    height: 20px;
-    background-color: #555;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-size: 12px;
-    border-radius: 3px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
+.tree-panel .return-btn,
+.tree-panel .logout-btn,
 .tree-panel .download-btn {
-    position: absolute;
-    top: 5px;
-    right: 55px;
     width: 20px;
     height: 20px;
     background-color: #555;
@@ -133,6 +109,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.tree-panel .return-btn:hover,
+.tree-panel .logout-btn:hover,
+.tree-panel .download-btn:hover {
+    background-color: #777;
 }
 
 .tree-node {
@@ -242,6 +224,29 @@
     margin-right: 10px;
 }
 
+.slider-container select {
+    width: 100px;
+    margin-right: 10px;
+    background-color: #555;
+    color: white;
+    border: 1px solid #666;
+    border-radius: 3px;
+    padding: 2px 5px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.slider-container select:hover {
+    background-color: #666;
+    border-color: #777;
+}
+
+.slider-container select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 3px rgba(0, 123, 255, 0.3);
+}
+
 .slider-label {
     color: white;
     font-size: 12px;
@@ -258,4 +263,8 @@
 }
 .tree-node.useless_selected{
     background-color: #ff0000;
+}
+
+.config-panel{
+    color: white;
 }

@@ -34,11 +34,32 @@
         current_pointer_type: null,
         current_style: 'pen1',
         current_file: null,
-        image_creator:{
-            url:''
+        image_creator: {
+            url: ''
+        },
+        background: {
+            type: "empty",
+            empty: {
+                color: 'rgba(255, 255, 255, 1)'
+            },
+            line: {
+                color: 'rgba(107, 107, 107, 1)',
+                line_width: 2,
+                interval: 200
+            },
+            grid: {
+                color: 'rgba(107, 107, 107, 1)',
+                line_width: 2,
+                interval: 200
+            },
+            dotted: {
+                color: 'rgba(107, 107, 107, 1)',
+                radius: 5,
+                interval: 200
+            }
         }
     };
-    window.notebook.Tips={
-        'dye':'Dye is to change the style of selected object to the last brush you use!'
+    window.notebook.Tips = {
+        'dye': 'Dye is to change the style of selected object to the last brush you use!'
     }
 })();

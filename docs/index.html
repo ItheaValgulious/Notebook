@@ -25,12 +25,15 @@
 
     <script src="front/canvas/canvas_obj.js"></script>
 
+    <script src="front/canvas/background.js"></script>
+
     <script src="front/canvas/stroke_style.js"></script>
     <script src="front/canvas/stroke_point.js"></script>
-    <script src="front/canvas/canvas.js"></script>
     <script src="front/canvas/stroke.js"></script>
     <script src="front/canvas/picture.js"></script>
     <script src="front/canvas/markdown.js"></script>
+
+    <script src="front/canvas/canvas.js"></script>
     <script src="front/canvas/pen.js"></script>
 
     <script src="front/ui/info.js"></script>
@@ -50,12 +53,14 @@
         <button id="tree-btn" title="Tree">
             <i class="fas fa-sitemap"></i></button>
         <div class="tree-panel" id="tree-panel">
-            <button class="collapse-btn">
-                <i class="fas fa-times"></i></button>
-            <button class="return-btn" title="Return to Root">
-                <i class="fas fa-home"></i></button>
-            <button class="download-btn" title="Download">
-                <i class="fas fa-download"></i></button>
+            <div class="button-container">
+                <button class="logout-btn" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i></button>
+                <button class="download-btn" title="Download">
+                    <i class="fas fa-download"></i></button>
+                <button class="return-btn" title="Return to Root">
+                    <i class="fas fa-home"></i></button>
+            </div>
             <div id="file-info"></div>
             <div id="tree-content"></div>
         </div>
@@ -81,6 +86,7 @@
             <span class="brush-preview"></span>
         </button>
         <div class="config-panel" id="brush-config-1">
+            Brush 1:</br>
             <canvas class="color-wheel" data-brush="1"></canvas>
             <div class="slider-container">
                 <input type="range" class="slider" data-brush="1" id="brush-size-1" min="1" max="10" value="5" />
@@ -95,6 +101,7 @@
             <span class="brush-preview"></span>
         </button>
         <div class="config-panel" id="brush-config-2">
+            Brush 2:</br>
             <canvas class="color-wheel" data-brush="2"></canvas>
             <div class="slider-container">
                 <input type="range" class="slider" data-brush="2" id="brush-size-2" min="1" max="10" value="5" />
@@ -109,6 +116,7 @@
             <span class="brush-preview"></span>
         </button>
         <div class="config-panel" id="brush-config-3">
+            Brush 3:</br>
             <canvas class="color-wheel" data-brush="3"></canvas>
             <div class="slider-container">
                 <input type="range" class="slider" data-brush="3" id="brush-size-3" min="1" max="10" value="5" />
@@ -123,6 +131,7 @@
             <span class="brush-preview"></span>
         </button>
         <div class="config-panel" id="brush-config-4">
+            Brush 4:</br>
             <canvas class="color-wheel" data-brush="4"></canvas>
             <div class="slider-container">
                 <input type="range" class="slider" data-brush="4" id="brush-size-4" min="1" max="10" value="5" />
@@ -137,6 +146,7 @@
             <span class="brush-preview"></span>
         </button>
         <div class="config-panel" id="brush-config-5">
+            Brush 5:</br>
             <canvas class="color-wheel" data-brush="5"></canvas>
             <div class="slider-container">
                 <input type="range" class="slider" data-brush="5" id="brush-size-5" min="1" max="10" value="5" />
@@ -151,6 +161,7 @@
             <i class="fas fa-eraser"></i>
         </button>
         <div class="config-panel" id="eraser-config">
+            Eraser:
             <div class="slider-container">
                 <input type="range" class="slider" id="eraser-size" min="1" max="10" value="5" />
                 <span class="slider-label" id="eraser-size-label">Width: 5</span>
@@ -168,6 +179,25 @@
                     <input type="checkbox" id="eraser-markdown" checked />
                     <span>Markdown</span>
                 </label>
+            </div>
+        </div>
+        <button id="background-btn" data-brush="background" title="Background">
+            <i class="fas fa-gear"></i>
+        </button>
+        <div class="config-panel" id="background-config">
+            Background:
+            <canvas class="color-wheel" id="background-color-wheel"></canvas>
+            <div class="slider-container">
+                <input type="range" class="slider" id="background-lightness" min="0" max="100" value="50" />
+                <span class="slider-label" id="background-lightness-label">Lightness: 50</span>
+            </div>
+            <div class="slider-container">
+                <select id="background-type" class="slider">
+                    <option value="empty">Empty</option>
+                    <option value="line">Line</option>
+                    <option value="grid">Grid</option>
+                    <option value="dot">Dot</option>
+                </select>
             </div>
         </div>
         <button id="lasso-btn" data-brush="lasso" title="Lasso">

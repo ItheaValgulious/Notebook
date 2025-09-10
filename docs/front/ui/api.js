@@ -149,7 +149,7 @@
         async new_folder(path) {
             try {
                 // Create folder by making a POST request with empty content
-                const response = await fetch(`${this.baseUrl}/file/${path}?token=${this.token}`, {
+                const response = await fetch(`${this.baseUrl}/file/${path}?token=${this.token}&type=folder`, {
                     method: 'POST',
                     body: ''
                 });

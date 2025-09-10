@@ -118,13 +118,18 @@
         var filename = `note_${year}_${month}_${day}_${hours}_${minutes}_${seconds}.fire`;
         return filename;
     }
+    
+    function virtual_func_error() {
+        throw new Error('virtual function not implemented');
+    }
 
     window.notebook.utils = {
+        virtual_func_error: virtual_func_error,
         distance: distance,
         distance_to_line: distance_to_line,
         Rect: Rect,
         Point: Point,
         Waiter: Waiter,
-        generate_filename:generate_filename
+        generate_filename: generate_filename
     };
 })();

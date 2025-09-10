@@ -6,6 +6,11 @@
             data = JSON.parse(content);
             notebook.canvas.load(data.canvas);
             notebook.toolbar.manager.load(data.toolbar);
+            
+            // Sync background button UI with loaded configuration
+            if (typeof set_background_button_ui === 'function') {
+                set_background_button_ui();
+            }
 
             notebook.Env.current_file = path;
         },

@@ -155,11 +155,9 @@
                 this.dirty_rect.y2 - this.dirty_rect.y1);
         }
 
-        this.ctx.clearRect(this.dirty_rect.x1, this.dirty_rect.y1,
-            this.dirty_rect.x2 - this.dirty_rect.x1,
-            this.dirty_rect.y2 - this.dirty_rect.y1);
-        for (var stroke of this.objects) {
-            stroke.draw(this.ctx, this.dirty_rect);
+        notebook.background_manager.get().draw(this.dirty_rect, this.ctx);
+        for (var obj of this.objects) {
+            obj.draw(this.ctx, this.dirty_rect);
         }
         this.dirty_rect = notebook.utils.Rect.empty();
 
@@ -175,6 +173,7 @@
         data.objects = this.objects.map(function (o) { return o.save(); });
         data.styles = notebook.stroke_styles.save();
         data.pos = { x: this.pos.x, y: this.pos.y, scale: this.scale };
+        data.background = notebook.Env.background;
 
         return data;
     }
@@ -185,6 +184,12 @@
         this.objects = [];
         this.content_container.innerHTML = '';
         notebook.stroke_styles.load(data.styles);
+        
+        // Load background configuration
+        if (data.background) {
+            notebook.Env.background = data.background;
+        }
+        
         this.set_style();
 
         for (var o of data.objects) {
@@ -195,8 +200,8 @@
             else if (o.type == 'markdown') {
                 var markdown = notebook.MarkdownArea.load(o);
                 this.add_object(markdown);
-            }else if (o.type == 'picture'){
-                var picture=notebook.PictureObj.load(o);
+            } else if (o.type == 'picture') {
+                var picture = notebook.PictureObj.load(o);
                 this.add_object(picture);
             }
         }
@@ -230,7 +235,7 @@
         if (this.scale > notebook.Config.max_scale) this.scale = notebook.Config.max_scale;
         var new_scale = this.scale;
 
-        var center=this.get_true_position(this.width/2,this.height/2);
+        var center = this.get_true_position(this.width / 2, this.height / 2);
 
         this.move((center.x * new_scale - center.x * old_scale),
             (center.y * new_scale - center.y * old_scale));

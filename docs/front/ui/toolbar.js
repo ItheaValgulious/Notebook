@@ -19,12 +19,26 @@
 
     function set_eraser(obj) {
         notebook.Env.current_pen['pen'] = 'eraser';
-        
+
         // Set eraser config values
         notebook.Env.eraser.stroke = document.getElementById('eraser-stroke').checked;
         notebook.Env.eraser.picture = document.getElementById('eraser-picture').checked;
         notebook.Env.eraser.markdown = document.getElementById('eraser-markdown').checked;
         notebook.Env.eraser.radius = obj.width * 2;
+    }
+
+    function set_background(obj) {
+        // Set background configuration
+        if (notebook.Config && notebook.Env.background && notebook.background_manager) {
+            // Update the color for the selected background type
+            notebook.Env.background.empty.color = obj.color;
+
+            // Set the current background type
+            notebook.background_manager.set(obj.type);
+
+            // Trigger canvas redraw
+            notebook.canvas.add_dirty_rect(notebook.canvas.screen_rect());
+        }
     }
 
 
@@ -36,14 +50,15 @@
         new UIButton('brush-4', 'brush', set_brush, set_brush),
         new UIButton('brush-5', 'brush', set_brush, set_brush),
         new UIButton('eraser', 'eraser', set_eraser, set_eraser),
+        new UIButton('background', 'background', set_background, set_background),
 
         new UIButton('lasso', 'lasso', () => { notebook.Env.current_pen['pen'] = 'selector'; }),
 
         new UIButton('image', 'image', async () => {
-            const url=(await notebook.file.upload_picture());
+            const url = (await notebook.file.upload_picture());
             notebook.Env.current_pen['pen'] = 'image_creator';
             notebook.Env.image_creator.url = url;
-            
+
         }),
         new UIButton('markdown', 'markdown', () => { notebook.Env.current_pen['pen'] = 'markdown_creator'; }),
 
@@ -73,14 +88,60 @@
         label.textContent = `${prefix}: ${value}`;
     }
 
+
+    // Function to sync background button UI with configuration
+    function set_background_button_ui() {
+        if (!notebook.Env.background) return;
+
+        const backgroundBtn = document.getElementById('background-btn');
+        const backgroundType = document.getElementById('background-type');
+        const backgroundLightness = document.getElementById('background-lightness');
+        const backgroundColorWheel = document.getElementById('background-color-wheel');
+
+        if (!backgroundBtn || !backgroundType || !backgroundLightness) return;
+
+        // Get current background configuration
+        const bgConfig = notebook.Env.background;
+        const currentType = bgConfig.type || 'empty';
+        const currentColor = bgConfig[currentType]?.color || '#ffffff';
+
+        // Update background button dataset
+        backgroundBtn.dataset.color = currentColor;
+        backgroundBtn.dataset.type = currentType;
+
+        // Update background type selector
+        backgroundType.value = currentType;
+
+        // Parse HSL values from current color
+        const hslMatch = currentColor.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+        if (hslMatch) {
+            const hue = parseInt(hslMatch[1]);
+            const saturation = parseInt(hslMatch[2]);
+            const lightness = parseInt(hslMatch[3]);
+
+            // Update lightness slider
+            backgroundLightness.value = lightness;
+            updateSliderLabel('background-lightness', 'background-lightness-label', 'Lightness', lightness);
+
+            // Update color wheel indicator (if needed)
+            // Note: Color wheel indicator position could be updated here if required
+        }
+
+        // Update background button preview color
+        const backgroundPreview = backgroundBtn.querySelector('.background-preview');
+        if (backgroundPreview) {
+            backgroundPreview.style.backgroundColor = currentColor;
+        }
+    }
+
     let selectedTool = null;
 
 
 
     //init all
     function _init_toolbar() {
-        window.addEventListener('keydown',(e)=>{
-            if(e.key=='s'&&e.ctrlKey){
+        window.addEventListener('keydown', (e) => {
+            if (e.key == 's' && e.ctrlKey) {
                 e.preventDefault();
                 notebook.file.save_file();
                 notebook.tree.update();
@@ -159,6 +220,7 @@
             ctx.drawImage(offscreenCanvas, 0, 0, canvas.width, canvas.height);
         });
 
+
         // Initialize brush preview sizes and slider labels
         document.querySelectorAll('.brush').forEach(brush => {
             const brushIndex = brush.dataset.brush;
@@ -176,19 +238,16 @@
         // Tree Panel
         const treeBtn = document.getElementById('tree-btn');
         const treePanelDom = document.getElementById('tree-panel');
-        const collapseBtn = treePanelDom.querySelector('.collapse-btn');
         treeBtn.addEventListener('click', () => {
             treePanelDom.classList.toggle('show');
         });
-        collapseBtn.addEventListener('click', () => {
-            treePanelDom.classList.remove('show');
-        });
 
-        // Tool Buttons (Brush, Eraser, Lasso, Image, Markdown, Setting, Mode)
+        // Tool Buttons (Brush, Eraser, Background, Lasso, Image, Markdown, Setting, Mode)
 
         const toolButtons = [
             ...document.querySelectorAll('.brush'),
             document.getElementById('eraser-btn'),
+            document.getElementById('background-btn'),
             document.getElementById('lasso-btn'),
             document.getElementById('image-btn'),
             document.getElementById('markdown-btn'),
@@ -208,27 +267,29 @@
             const uiButton = uiButtons.find(btn => btn.id === `brush-${brushIndex}`);
 
             brush.addEventListener('click', (e) => {
-            const rect = brush.getBoundingClientRect();
-            if (selectedTool === brush) {
-                configPanel.classList.toggle('show');
-                configPanel.style.top = `${rect.top}px`;
-            } else {
-                toolButtons.forEach(b => {
-                    b.classList.remove('active');
-                    if (b.classList.contains('brush')) {
-                        document.getElementById(`brush-config-${b.dataset.brush}`).classList.remove('show');
-                    } else if (b.id === 'eraser-btn') {
-                        document.getElementById('eraser-config').classList.remove('show');
-                    } else if (b.id === 'mode-btn') {
-                        document.getElementById('mode-dropdown').classList.remove('show');
-                    }
-                });
-                brush.classList.add('active');
-                selectedTool = brush;
-                configPanel.classList.remove('show');
-                uiButton.on_choose({ color: brush.dataset.color, width: parseInt(brushSize.value) });
-            }
-        });
+                const rect = brush.getBoundingClientRect();
+                if (selectedTool === brush) {
+                    configPanel.classList.toggle('show');
+                    configPanel.style.top = `${rect.top}px`;
+                } else {
+                    toolButtons.forEach(b => {
+                        b.classList.remove('active');
+                        if (b.classList.contains('brush')) {
+                            document.getElementById(`brush-config-${b.dataset.brush}`).classList.remove('show');
+                        } else if (b.id === 'eraser-btn') {
+                            document.getElementById('eraser-config').classList.remove('show');
+                        } else if (b.id === 'background-btn') {
+                            document.getElementById('background-config').classList.remove('show');
+                        } else if (b.id === 'mode-btn') {
+                            document.getElementById('mode-dropdown').classList.remove('show');
+                        }
+                    });
+                    brush.classList.add('active');
+                    selectedTool = brush;
+                    configPanel.classList.remove('show');
+                    uiButton.on_choose({ color: brush.dataset.color, width: parseInt(brushSize.value) });
+                }
+            });
 
             colorWheel.addEventListener('click', (e) => {
                 const rect = colorWheel.getBoundingClientRect();
@@ -325,6 +386,90 @@
             notebook.Env.eraser.markdown = eraserMarkdown.checked;
         });
 
+        // Background
+        const backgroundBtn = document.getElementById('background-btn');
+        const backgroundConfig = document.getElementById('background-config');
+        const backgroundColorWheel = document.getElementById('background-color-wheel');
+        const backgroundLightness = document.getElementById('background-lightness');
+        const backgroundType = document.getElementById('background-type');
+        const backgroundUIButton = uiButtons.find(btn => btn.id === 'background');
+
+        // Initialize background color
+        backgroundBtn.dataset.color = '#ffffff';
+        backgroundBtn.dataset.type = 'empty';
+
+        // Initialize background lightness slider
+        backgroundLightness.value = 100; // Full lightness for white
+        updateSliderLabel('background-lightness', 'background-lightness-label', 'Lightness', 100);
+
+        // Initialize background type selector
+        backgroundType.value = 'empty';
+
+        // Set initial background button preview color
+        const backgroundPreview = backgroundBtn.querySelector('.background-preview');
+        if (backgroundPreview) {
+            backgroundPreview.style.backgroundColor = '#ffffff';
+        }
+
+        backgroundBtn.addEventListener('click', (e) => {
+            const rect = backgroundBtn.getBoundingClientRect();
+            if (selectedTool === backgroundBtn) {
+                backgroundConfig.classList.toggle('show');
+                backgroundConfig.style.top = `${rect.top}px`;
+            } else {
+                toolButtons.forEach(b => {
+                    b.classList.remove('active');
+                    if (b.classList.contains('brush')) {
+                        document.getElementById(`brush-config-${b.dataset.brush}`).classList.remove('show');
+                    } else if (b.id === 'eraser-btn') {
+                        document.getElementById('eraser-config').classList.remove('show');
+                    } else if (b.id === 'mode-btn') {
+                        document.getElementById('mode-dropdown').classList.remove('show');
+                    }
+                });
+                backgroundBtn.classList.add('active');
+                selectedTool = backgroundBtn;
+                backgroundConfig.classList.add('show');
+                backgroundConfig.style.top = `${rect.top}px`;
+                backgroundUIButton.on_choose({
+                    color: backgroundBtn.dataset.color,
+                    type: backgroundType.value
+                });
+            }
+        });
+
+        backgroundColorWheel.addEventListener('click', (e) => {
+            const rect = backgroundColorWheel.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            const distance = Math.sqrt(x * x + y * y);
+            const angle = Math.atan2(y, x) * 180 / Math.PI + 180;
+            const hue = angle / 360;
+            const saturation = Math.min(distance / (rect.width / 2), 1);
+            const lightness = backgroundLightness.value / 100;
+            const color = `hsl(${hue * 360}, ${saturation * 100}%, ${lightness * 100}%)`;
+            backgroundBtn.dataset.color = color;
+            backgroundUIButton.on_config({ color, type: backgroundType.value });
+        });
+
+        backgroundLightness.addEventListener('input', () => {
+            const hue = parseFloat(backgroundBtn.dataset.color.match(/hsl\((\d+)/)?.[1] || 0) / 360;
+            const saturation = parseFloat(backgroundBtn.dataset.color.match(/, (\d+)%/)?.[1] || 100) / 100;
+            const lightness = backgroundLightness.value / 100;
+            const color = `hsl(${hue * 360}, ${saturation * 100}%, ${lightness * 100}%)`;
+            backgroundBtn.dataset.color = color;
+            updateSliderLabel('background-lightness', 'background-lightness-label', 'Lightness', backgroundLightness.value);
+            backgroundUIButton.on_config({ color, type: backgroundType.value });
+        });
+
+        backgroundType.addEventListener('change', () => {
+            backgroundBtn.dataset.type = backgroundType.value;
+            backgroundUIButton.on_config({
+                color: backgroundBtn.dataset.color,
+                type: backgroundType.value
+            });
+        });
+
         // Lasso
         const lassoBtn = document.getElementById('lasso-btn');
         const lassoUIButton = uiButtons.find(btn => btn.id === 'lasso');
@@ -334,6 +479,8 @@
                     b.classList.remove('active');
                     if (b.id === 'eraser-btn') {
                         document.getElementById('eraser-config').classList.remove('show');
+                    } else if (b.id === 'background-btn') {
+                        document.getElementById('background-config').classList.remove('show');
                     } else if (b.id === 'mode-btn') {
                         document.getElementById('mode-dropdown').classList.remove('show');
                     }
@@ -353,6 +500,8 @@
                     b.classList.remove('active');
                     if (b.id === 'eraser-btn') {
                         document.getElementById('eraser-config').classList.remove('show');
+                    } else if (b.id === 'background-btn') {
+                        document.getElementById('background-config').classList.remove('show');
                     } else if (b.id === 'mode-btn') {
                         document.getElementById('mode-dropdown').classList.remove('show');
                     }
@@ -373,6 +522,8 @@
                     b.classList.remove('active');
                     if (b.id === 'eraser-btn') {
                         document.getElementById('eraser-config').classList.remove('show');
+                    } else if (b.id === 'background-btn') {
+                        document.getElementById('background-config').classList.remove('show');
                     } else if (b.id === 'mode-btn') {
                         document.getElementById('mode-dropdown').classList.remove('show');
                     }
@@ -392,6 +543,8 @@
                     b.classList.remove('active');
                     if (b.id === 'eraser-btn') {
                         document.getElementById('eraser-config').classList.remove('show');
+                    } else if (b.id === 'background-btn') {
+                        document.getElementById('background-config').classList.remove('show');
                     } else if (b.id === 'mode-btn') {
                         document.getElementById('mode-dropdown').classList.remove('show');
                     }
@@ -412,6 +565,8 @@
                     b.classList.remove('active');
                     if (b.id === 'eraser-btn') {
                         document.getElementById('eraser-config').classList.remove('show');
+                    } else if (b.id === 'background-btn') {
+                        document.getElementById('background-config').classList.remove('show');
                     }
                 }
             });
@@ -433,14 +588,14 @@
         const setscaleBtn = document.getElementById('setscale-btn');
         setscaleBtn.addEventListener('click', () => {
             if (notebook.canvas) {
-                if(notebook.canvas.scale==1)return;
-                var scale_loop=setInterval(()=>{
-                    if(Math.abs(notebook.canvas.scale-1)<0.01){
+                if (notebook.canvas.scale == 1) return;
+                var scale_loop = setInterval(() => {
+                    if (Math.abs(notebook.canvas.scale - 1) < 0.01) {
                         clearInterval(scale_loop);
-                        notebook.canvas.set_cale(1/notebook.canvas.scale);
+                        notebook.canvas.set_scale(1 / notebook.canvas.scale);
                     }
-                    notebook.canvas.set_scale(1+0.1*Math.sign(1-notebook.canvas.scale));
-                },10);
+                    notebook.canvas.set_scale(1 + 0.1 * Math.sign(1 - notebook.canvas.scale));
+                }, 10);
             }
         });
 
@@ -451,6 +606,9 @@
             }
             if (!eraserBtn.contains(e.target) && !eraserConfig.contains(e.target)) {
                 eraserConfig.classList.remove('show');
+            }
+            if (!backgroundBtn.contains(e.target) && !backgroundConfig.contains(e.target)) {
+                backgroundConfig.classList.remove('show');
             }
             brushes.forEach((b) => {
                 const configPanel = document.getElementById(`brush-config-${b.dataset.brush}`);
@@ -463,7 +621,8 @@
 
 
     notebook.toolbar.manager = {
-        get_brush(){
+        set_background_button_ui: set_background_button_ui,
+        get_brush() {
             // Find the currently active brush (if any)
             const activeBrush = document.querySelector('.brush.active');
             if (activeBrush) {
@@ -472,7 +631,7 @@
             // If no brush is active, return the first brush (default)
             return 0;
         },
-        get_brush_style(id){
+        get_brush_style(id) {
             const brush = document.querySelectorAll('.brush')[id];
             const color = brush.dataset.color;
             const width = document.getElementById(`brush-size-${id + 1}`).value;
@@ -509,7 +668,7 @@
                 configs.push({
                     color: hslColor,
                     width: parseInt(brushSize.value),
-                    dash:[]
+                    dash: []
                 });
             });
             return configs;

@@ -67,19 +67,19 @@
 }
 
 #signupBtn {
-    background-color: #4CAF50;
+    background-color: #333;
     color: white;
 }
 
 #signinBtn {
-    background-color: #008CBA;
+    background-color: #333;
     color: white;
 }
 
 #signupBtn:hover {
-    background-color: #45a049;
+    background-color: #007bff;
 }
 
 #signinBtn:hover {
-    background-color: #007399;
+    background-color: #007bff;
 }

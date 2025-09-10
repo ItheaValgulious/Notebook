@@ -1,7 +1,8 @@
-html{
+html {
     position: fixed;
     overflow: hidden;
 }
+
 body {
     position: fixed;
     overflow: hidden;
@@ -10,7 +11,7 @@ body {
     margin: 0;
 }
 
-*{
+* {
     box-sizing: border-box;
 }
 
@@ -21,7 +22,7 @@ body {
     right: 20px;
     padding: 10px;
     border-radius: 20px;
-    border:  solid 1px black;
+    border: solid 1px black;
     z-index: 1;
 }
 
@@ -35,28 +36,34 @@ canvas.notebook_canvas {
 }
 
 
-.content_container{
+.content_container {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    z-index: -1;
+    z-index: 1;
+    pointer-events: none;
+
     transform-origin: 0 0;
 }
-.markdown_area{
+
+.markdown_area {
     position: absolute;
 }
-.markdown_area.selected{
+
+.markdown_area.selected {
     outline: rgba(98, 145, 255, 0.79) 5px solid;
 }
 
-.vditor-ir pre.vditor-reset:focus{
+.vditor-ir pre.vditor-reset:focus {
     background: none !important;
 }
-.vditor-ir pre.vditor-reset{
+
+.vditor-ir pre.vditor-reset {
     background: none !important;
 }
-.vditor-toolbar--hide{
+
+.vditor-toolbar--hide {
     display: none;
 }

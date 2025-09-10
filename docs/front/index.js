@@ -13,6 +13,10 @@ window.onload = async () => {
     notebook.canvas = new notebook.Canvas();
     notebook.canvas.init();
 
+    document.addEventListener('contextmenu', function (event) {
+        event.preventDefault();
+    });
+
     setInterval(() => {
         if (notebook.Env.current_file) {
             notebook.file.save_file();

@@ -108,8 +108,11 @@
         }
         init() {
             this.treePanel.init(document.getElementById('tree-content'));
-            this.set_path('/')
-            
+            if (!localStorage.getItem('work_folder')) {
+                localStorage.setItem('work_folder','/');
+            }
+            this.set_path(localStorage.getItem('work_folder'));
+
             // Add return button event listener
             const returnBtn = document.querySelector('.return-btn');
             if (returnBtn) {
@@ -125,9 +128,19 @@
                     notebook.api.download();
                 });
             }
+
+            // Add logout button event listener
+            const logoutBtn = document.querySelector('.logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    localStorage.removeItem('token');
+                    location.reload();
+                });
+            }
         }
         async set_path(path) {
             this.path = path;
+            localStorage.setItem('work_folder',path)
             this.tree = await notebook.api.read_folder(path);
             this.treePanel.set_tree(this.construct_render_tree_obj(this.tree));
         }
