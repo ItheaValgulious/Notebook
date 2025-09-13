@@ -138,11 +138,11 @@
 
         save() {
             var data = {
-                points: this.points.map(p => ({ x: p.pos.x, y: p.pos.y, pressure: p.pressure })),
+                points: this.points.map(p => ({ x: parseInt(p.pos.x), y: parseInt(p.pos.y), pressure: parseInt(p.pressure*100)/100 })),
                 type: 'stroke',
 
                 styleid: this.styleid,
-                pos: { x: this.pos.x, y: this.pos.y }
+                pos: { x: parseInt(this.pos.x), y: parseInt(this.pos.y) }
             };
             return data;
         }
