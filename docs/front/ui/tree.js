@@ -156,7 +156,10 @@
             //set selection
             var range = document.createRange();
             range.setStart(label.firstChild, 0);
-            range.setEnd(label.firstChild, obj.label.indexOf('.'));
+            if(obj.label.indexOf('.')>=0)
+                range.setEnd(label.firstChild, obj.label.indexOf('.'));
+            else
+                range.setEnd(label.firstChild,obj.label.length);
             var selection = document.getSelection();
             selection.removeAllRanges();
             selection.addRange(range);
